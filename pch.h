@@ -8,6 +8,22 @@
 #define PCH_H
 
 // add headers that you want to pre-compile here
-#include "framework.h"
+#pragma once
+
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <d3d11.h>
+#include <cstdint>
+#include <string>
+#include <vector>
+#include <memory>
+
+// ImGui
+#include "imgui.h"
+#include "imgui_impl_win32.h"
+#include "imgui_impl_dx11.h"
+
+// MinHook
+#include "MinHook.h"
 
 #endif //PCH_H
