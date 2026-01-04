@@ -5,9 +5,9 @@
 !./il2cpp-dumper/
 
 # Auto-generated
-tools/offsets.json
-src/sdk/offsets.h
-tools/OFFSET_REPORT.md
+# tools/offsets.json
+# src/sdk/offsets.h
+# tools/OFFSET_REPORT.md
 
 # Created by https://www.toptal.com/developers/gitignore/api/c++,visualstudio,visualstudiocode,windows
 # Edit at https://www.toptal.com/developers/gitignore?templates=c++,visualstudio,visualstudiocode,windows
