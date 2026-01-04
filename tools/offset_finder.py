@@ -1,7 +1,24 @@
 import re
 import json
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
+from difflib import SequenceMatcher
+from dataclasses import dataclass
+
+@dataclass
+class ClassPattern:
+    """Pattern for finding game classes"""
+    keywords: List[str]  # Keywords to search for
+    priority: int  # Higher = more important
+    category: str  # Category (player, camera, etc.)
+    must_have_fields: List[str] = None  # Fields that should exist
+    must_have_methods: List[str] = None  # Methods that should exist
+
+    def __post_init__(self):
+        if self.must_have_fields is None:
+            self.must_have_fields = []
+        if self.must_have_methods is None:
+            self.must_have_methods = []
 
 class IL2CPPOffsetFinder:
     def __init__(self, dump_path: str, script_json_path: str):
@@ -10,6 +27,105 @@ class IL2CPPOffsetFinder:
         self.dump_content = ""
         self.script_json = {}
         self.offsets = {}
+        self.all_classes = []  # Store all found class names
+
+        # Define search patterns
+        self.patterns = [
+            # Player/Character - highest priority
+            ClassPattern(
+                keywords=["Player", "Character", "FPS", "FirstPerson"],
+                priority=100,
+                category="player",
+                must_have_fields=["transform", "position", "velocity"],
+                must_have_methods=["Update", "Move"]
+            ),
+
+            # Camera
+            ClassPattern(
+                keywords=["Camera", "MainCamera", "ViewCamera"],
+                priority=90,
+                category="camera",
+                must_have_methods=["WorldToScreenPoint"]
+            ),
+
+            # Targets
+            ClassPattern(
+                keywords=["Target", "Sphere", "Ball", "Enemy", "Orb"],
+                priority=80,
+                category="target",
+                must_have_fields=["position", "transform"]
+            ),
+
+            # Movement/Physics
+            ClassPattern(
+                keywords=["Movement", "Motor", "Controller"],
+                priority=70,
+                category="movement",
+                must_have_fields=["velocity", "speed"]
+            ),
+
+            # Game elements
+            ClassPattern(
+                keywords=["Finish", "Goal", "End", "Complete"],
+                priority=60,
+                category="finish"
+            ),
+
+            ClassPattern(
+                keywords=["Button", "Interact", "Activat", "Trigger"],
+                priority=50,
+                category="interactable"
+            ),
+
+            # Managers
+            ClassPattern(
+                keywords=["GameManager", "SceneManager", "LevelManager"],
+                priority=40,
+                category="manager"
+            ),
+
+            ClassPattern(
+                keywords=["TimeManager", "TimeScale"],
+                priority=40,
+                category="time"
+            ),
+        ]
+
+    def manual_search_classes(self) -> Dict:
+    """Manually search for specific class names we know exist"""
+    print(f"\n[*] Manual search for known classes...")
+
+    known_classes = [
+        "Player",
+        "Camera",
+        "Transform",
+        "TimeManager",
+        "FinishPanel",
+        "PlayerMovementComponent",
+        "PlayerWarpComponent",
+        "PlayerComboComponent",
+        "Panel"  # Base class for FinishPanel and likely buttons
+    ]
+
+    results = {}
+
+    for class_name in known_classes:
+        class_content = self.find_class_full(class_name)
+        if class_content:
+            namespace_match = re.search(r'// Namespace: ([^\n]+)', class_content)
+            namespace = namespace_match.group(1) if namespace_match else ""
+
+            # Only take classes from Hyperstrange.WARPZ or UnityEngine
+            if namespace in ["Hyperstrange.WARPZ", "UnityEngine", ""]:
+                results[class_name] = {
+                    'namespace': namespace,
+                    'fields': self.extract_fields(class_content),
+                    'methods': self.extract_methods(class_content),
+                    'content_preview': class_content[:400]
+                }
+                print(f"  [+] Found: {namespace}.{class_name}")
+
+    return results
 
     def load_files(self):
         """Load dump.cs and script.json"""
@@ -21,23 +137,46 @@ class IL2CPPOffsetFinder:
         with open(self.script_json_path, 'r', encoding='utf-8') as f:
             self.script_json = json.load(f)
 
-    def find_class(self, class_name: str) -> Optional[str]:
-        """Find a class definition in dump.cs"""
-        pattern = rf'// Namespace:.*?\n(?:public )?class {re.escape(class_name)}[^\n]*\n\{{'
-        match = re.search(pattern, self.dump_content, re.MULTILINE)
-        if match:
-            return match.group(0)
-        return None
+        # Extract all class names for fuzzy matching
+        self._extract_all_classes()
 
-    def find_class_full(self, class_name: str, lines_after: int = 100) -> Optional[str]:
+    def _extract_all_classes(self):
+        """Extract all class names from dump.cs"""
+        pattern = r'(?:public |private |internal )?class ([A-Za-z0-9_]+)'
+        matches = re.finditer(pattern, self.dump_content)
+        self.all_classes = [m.group(1) for m in matches]
+        print(f"[*] Found {len(self.all_classes)} total classes")
+
+    def fuzzy_match(self, keyword: str, threshold: float = 0.6) -> List[Tuple[str, float]]:
+        """Find classes that fuzzy match a keyword"""
+        matches = []
+        keyword_lower = keyword.lower()
+
+        for class_name in self.all_classes:
+            class_lower = class_name.lower()
+
+            # Exact substring match
+            if keyword_lower in class_lower:
+                matches.append((class_name, 1.0))
+                continue
+
+            # Fuzzy match
+            ratio = SequenceMatcher(None, keyword_lower, class_lower).ratio()
+            if ratio >= threshold:
+                matches.append((class_name, ratio))
+
+        # Sort by ratio (highest first)
+        matches.sort(key=lambda x: x[1], reverse=True)
+        return matches
+
+    def find_class_full(self, class_name: str) -> Optional[str]:
         """Find full class definition with fields and methods"""
-        pattern = rf'(// Namespace:.*?\n(?:public )?class {re.escape(class_name)}[^\n]*\n\{{)'
+        pattern = rf'(// Namespace:.*?\n(?:public |private |internal )?class {re.escape(class_name)}[^\n]*\n\{{)'
         match = re.search(pattern, self.dump_content, re.MULTILINE)
         if not match:
             return None
 
         start_pos = match.start()
-        # Find the end of the class (closing brace at the same indentation level)
         brace_count = 0
         in_class = False
         end_pos = start_pos
@@ -57,13 +196,14 @@ class IL2CPPOffsetFinder:
     def extract_fields(self, class_content: str) -> Dict[str, Dict]:
         """Extract field names and offsets from class content"""
         fields = {}
-        # Pattern: // RVA: 0xXXXXXXXX Offset: 0xXXXXXXXX VA: 0xXXXXXXXX
-        # followed by field declaration
         pattern = r'// RVA: (0x[0-9A-F]+) Offset: (0x[0-9A-F]+) VA: (0x[0-9A-F]+)\s*(?:public|private|protected|internal)?\s+(?:static\s+)?([^\s]+)\s+([^\s;]+);'
 
         for match in re.finditer(pattern, class_content):
             rva, offset, va, field_type, field_name = match.groups()
-            fields[field_name] = {
+            # Clean up field name (remove array brackets, etc.)
+            field_name_clean = field_name.split('[')[0]
+
+            fields[field_name_clean] = {
                 'type': field_type,
                 'offset': offset,
                 'rva': rva,
@@ -75,8 +215,7 @@ class IL2CPPOffsetFinder:
     def extract_methods(self, class_content: str) -> Dict[str, Dict]:
         """Extract method names and addresses"""
         methods = {}
-        # Pattern for methods with addresses
-        pattern = r'// RVA: (0x[0-9A-F]+) Offset: (0x[0-9A-F]+) VA: (0x[0-9A-F]+)\s*(?:public|private|protected|internal)?\s+(?:static\s+)?(?:virtual\s+)?([^\s]+)\s+([^\s(]+)\('
+        pattern = r'// RVA: (0x[0-9A-F]+) Offset: (0x[0-9A-F]+) VA: (0x[0-9A-F]+)\s*(?:public|private|protected|internal)?\s+(?:static\s+)?(?:virtual\s+)?(?:override\s+)?([^\s]+)\s+([^\s(]+)\('
 
         for match in re.finditer(pattern, class_content):
             rva, offset, va, return_type, method_name = match.groups()
@@ -89,152 +228,238 @@ class IL2CPPOffsetFinder:
 
         return methods
 
-    def find_unity_methods(self) -> Dict:
-        """Find common Unity methods we need to hook"""
-        unity_methods = {}
+    def validate_class(self, class_content: str, pattern: ClassPattern) -> Tuple[bool, int]:
+        """Validate if class matches pattern requirements"""
+        fields = self.extract_fields(class_content)
+        methods = self.extract_methods(class_content)
 
-        # Camera.WorldToScreenPoint
-        camera_class = self.find_class_full("Camera")
-        if camera_class:
-            methods = self.extract_methods(camera_class)
-            if "WorldToScreenPoint" in methods:
-                unity_methods["Camera.WorldToScreenPoint"] = methods["WorldToScreenPoint"]
+        score = 0
 
-        return unity_methods
+        # Check must-have fields
+        for required_field in pattern.must_have_fields:
+            # Fuzzy match field names
+            field_names_lower = [f.lower() for f in fields.keys()]
+            if any(required_field.lower() in fn for fn in field_names_lower):
+                score += 10
+            else:
+                return False, 0  # Missing required field
 
-    def search_classes(self, patterns: List[str]) -> Dict:
-        """Search for classes matching patterns"""
+        # Check must-have methods
+        for required_method in pattern.must_have_methods:
+            method_names_lower = [m.lower() for m in methods.keys()]
+            if any(required_method.lower() in mn for mn in method_names_lower):
+                score += 10
+            else:
+                return False, 0  # Missing required method
+
+        # Bonus points for having both fields and methods
+        if fields and methods:
+            score += 5
+
+        return True, score
+
+    def smart_search(self) -> Dict:
+        """Intelligently search for all needed classes"""
         results = {}
 
-        for pattern in patterns:
-            print(f"[*] Searching for: {pattern}")
-            # Try exact match first
-            class_content = self.find_class_full(pattern)
-            if class_content:
+        for pattern in self.patterns:
+            print(f"\n[*] Searching for {pattern.category} classes...")
+            category_matches = []
+
+            for keyword in pattern.keywords:
+                # Fuzzy match classes
+                matches = self.fuzzy_match(keyword, threshold=0.5)
+
+                for class_name, match_ratio in matches[:10]:  # Top 10 matches
+                    class_content = self.find_class_full(class_name)
+                    if not class_content:
+                        continue
+
+                    # Validate class
+                    is_valid, validation_score = self.validate_class(class_content, pattern)
+
+                    if is_valid or not pattern.must_have_fields:  # Accept if valid or no requirements
+                        total_score = (match_ratio * pattern.priority) + validation_score
+
+                        namespace_match = re.search(r'// Namespace: ([^\n]+)', class_content)
+                        namespace = namespace_match.group(1) if namespace_match else ""
+
+                        category_matches.append({
+                            'class_name': class_name,
+                            'namespace': namespace,
+                            'score': total_score,
+                            'match_ratio': match_ratio,
+                            'validation_score': validation_score,
+                            'fields': self.extract_fields(class_content),
+                            'methods': self.extract_methods(class_content),
+                            'content_preview': class_content[:300]
+                        })
+
+            # Sort by score and take best match
+            if category_matches:
+                category_matches.sort(key=lambda x: x['score'], reverse=True)
+                best_match = category_matches[0]
+
+                print(f"  [+] Best match for {pattern.category}: {best_match['class_name']}")
+                print(f"      Namespace: {best_match['namespace']}")
+                print(f"      Score: {best_match['score']:.2f} (match: {best_match['match_ratio']:.2f}, validation: {best_match['validation_score']})")
+                print(f"      Fields: {len(best_match['fields'])}, Methods: {len(best_match['methods'])}")
+
+                results[best_match['class_name']] = best_match
+
+                # Show alternatives
+                if len(category_matches) > 1:
+                    print(f"      Alternatives:")
+                    for alt in category_matches[1:3]:
+                        print(f"        - {alt['class_name']} (score: {alt['score']:.2f})")
+            else:
+                print(f"  [-] No matches found for {pattern.category}")
+
+        return results
+
+    def find_unity_engine_classes(self) -> Dict:
+        """Find important Unity Engine classes"""
+        unity_classes = {}
+        important_unity = ["Camera", "Transform", "GameObject", "Rigidbody", "Time", "Input"]
+
+        print(f"\n[*] Searching for Unity Engine classes...")
+        for class_name in important_unity:
+            class_content = self.find_class_full(class_name)
+            if class_content and "UnityEngine" in class_content:
                 namespace_match = re.search(r'// Namespace: ([^\n]+)', class_content)
                 namespace = namespace_match.group(1) if namespace_match else ""
 
-                results[pattern] = {
+                unity_classes[class_name] = {
                     'namespace': namespace,
                     'fields': self.extract_fields(class_content),
-                    'methods': self.extract_methods(class_content),
-                    'full_content': class_content[:500] + "..." if len(class_content) > 500 else class_content
+                    'methods': self.extract_methods(class_content)
                 }
-                print(f"  [+] Found: {namespace}.{pattern}")
-            else:
-                print(f"  [-] Not found: {pattern}")
+                print(f"  [+] Found: UnityEngine.{class_name}")
 
-        return results
+        return unity_classes
 
     def generate_header(self, output_path: str):
         """Generate C++ header with offsets"""
         header = """#pragma once
 // Auto-generated offsets from IL2CPP dump
 // Generated by offset_finder.py
+// DO NOT EDIT MANUALLY - Run `python tools/offset_finder.py` to regenerate
+
+#include <cstdint>
 
 namespace Offsets {
 """
 
         for class_name, class_data in self.offsets.items():
-            header += f"\n\t// {class_data.get('namespace', '')}.{class_name}\n"
+            namespace = class_data.get('namespace', '')
+            header += f"\n\t// {namespace}.{class_name}\n"
+
+            # Add category comment if available
+            if 'category' in class_data:
+                header += f"\t// Category: {class_data['category']}\n"
+
             header += f"\tnamespace {class_name} {{\n"
 
             if class_data.get('fields'):
                 header += "\t\t// Fields\n"
                 for field_name, field_data in class_data['fields'].items():
-                    header += f"\t\tconstexpr uintptr_t {field_name} = {field_data['offset']};\n"
+                    field_type = field_data.get('type', 'unknown')
+                    header += f"\t\tconstexpr uintptr_t {field_name} = {field_data['offset']}; // {field_type}\n"
 
             if class_data.get('methods'):
                 header += "\n\t\t// Methods\n"
                 for method_name, method_data in class_data['methods'].items():
-                    header += f"\t\tconstexpr uintptr_t {method_name} = {method_data['offset']};\n"
+                    return_type = method_data.get('return_type', 'void')
+                    header += f"\t\tconstexpr uintptr_t {method_name} = {method_data['offset']}; // {return_type}\n"
 
             header += "\t}\n"
 
         header += "}\n"
 
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, 'w') as f:
             f.write(header)
 
-        print(f"[+] Generated header: {output_path}")
+        print(f"\n[+] Generated header: {output_path}")
 
     def save_json(self, output_path: str):
         """Save offsets as JSON for easier reading"""
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
         with open(output_path, 'w', encoding='utf-8') as f:
             json.dump(self.offsets, f, indent=2)
 
         print(f"[+] Saved JSON: {output_path}")
 
+    def generate_summary_report(self, output_path: str):
+        """Generate human-readable summary report"""
+        report = "# IL2CPP Offset Finder Report\n\n"
+
+        for class_name, class_data in self.offsets.items():
+            report += f"## {class_name}\n"
+            report += f"- **Namespace**: {class_data.get('namespace', 'Unknown')}\n"
+
+            if 'category' in class_data:
+                report += f"- **Category**: {class_data['category']}\n"
+
+            if 'match_ratio' in class_data:
+                report += f"- **Match Confidence**: {class_data['match_ratio']:.2%}\n"
+
+            if 'content_preview' in class_data:
+                report += f"\n### Preview\n```csharp\n{class_data['content_preview']}\n```\n"
+
+            if class_data.get('fields'):
+                report += f"\n### Fields ({len(class_data['fields'])})\n"
+                for field_name, field_data in list(class_data['fields'].items())[:10]:
+                    report += f"- `{field_name}`: {field_data['type']} @ {field_data['offset']}\n"
+
+                if len(class_data['fields']) > 10:
+                    report += f"- ... and {len(class_data['fields']) - 10} more\n"
+
+            if class_data.get('methods'):
+                report += f"\n### Methods ({len(class_data['methods'])})\n"
+                for method_name, method_data in list(class_data['methods'].items())[:10]:
+                    report += f"- `{method_name}()`: {method_data['return_type']} @ {method_data['offset']}\n"
+
+                if len(class_data['methods']) > 10:
+                    report += f"- ... and {len(class_data['methods']) - 10} more\n"
+
+            report += "\n---\n\n"
+
+        Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+        with open(output_path, 'w', encoding='utf-8') as f:
+            f.write(report)
+
+        print(f"[+] Generated report: {output_path}")
+
 def main():
-    # Initialize finder
+    print("=" * 60)
+    print("IL2CPP Smart Offset Finder")
+    print("=" * 60)
+
     finder = IL2CPPOffsetFinder(
         dump_path="il2cpp-dumper/dump.cs",
         script_json_path="il2cpp-dumper/script.json"
     )
 
-    # Load files
     finder.load_files()
 
-    # Define what we're looking for
-    search_patterns = [
-        # Player/Character
-        "Player",
-        "PlayerController",
-        "FirstPersonController",
-        "CharacterController",
-        "FPSController",
+    # Manual search for known classes (highest priority)
+    game_classes = finder.manual_search_classes()
 
-        # Camera
-        "Camera",
-        "CameraController",
-        "MainCamera",
+    # Smart search for additional classes (panels, buttons, etc.)
+    smart_results = finder.smart_search()
 
-        # Targets
-        "Target",
-        "Sphere",
-        "Ball",
-        "Enemy",
-
-        # Movement
-        "Movement",
-        "PlayerMovement",
-        "Rigidbody",
-
-        # Game elements
-        "Finish",
-        "Goal",
-        "Button",
-        "Interactable",
-        "Door",
-
-        # Time
-        "Time",
-        "TimeManager",
-
-        # Transform (Unity)
-        "Transform",
-        "GameObject",
-    ]
-
-    # Search for classes
-    finder.offsets = finder.search_classes(search_patterns)
-
-    # Find Unity methods
-    unity_methods = finder.find_unity_methods()
-    if unity_methods:
-        finder.offsets["UnityEngine"] = {"methods": unity_methods}
+    # Merge results (manual takes priority)
+    finder.offsets = {**smart_results, **game_classes}
 
     # Generate outputs
     finder.generate_header("src/sdk/offsets.h")
     finder.save_json("tools/offsets.json")
+    finder.generate_summary_report("tools/OFFSET_REPORT.md")
 
-    # Print summary
-    print(f"\n[*] Summary:")
-    print(f"  Classes found: {len(finder.offsets)}")
-    for class_name, data in finder.offsets.items():
-        field_count = len(data.get('fields', {}))
-        method_count = len(data.get('methods', {}))
-        print(f"    {class_name}: {field_count} fields, {method_count} methods")
+    print("\n" + "=" * 60)
+    print(f"Summary: {len(finder.offsets)} classes found")
+    print("=" * 60)
 
 if __name__ == "__main__":
     main()
