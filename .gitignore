@@ -1,7 +1,12 @@
+# include il2cpp-dumper files even tho they are auto generated
 !./il2cpp-dumper/DummyDll/*.dll
 !./il2cpp-dumper/DummyDll/*
 !./il2cpp-dumper/*
 !./il2cpp-dumper/
+
+# Auto-generated
+tools/offsets.json
+src/sdk/offsets.h
 
 # Created by https://www.toptal.com/developers/gitignore/api/c++,visualstudio,visualstudiocode,windows
 # Edit at https://www.toptal.com/developers/gitignore?templates=c++,visualstudio,visualstudiocode,windows
