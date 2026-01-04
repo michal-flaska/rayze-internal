@@ -66,4 +66,57 @@ namespace Unity {
 		T* end() { return items + max_length; }
 		size_t size() const { return max_length; }
 	};
+
+	// Quaternion/Euler conversion helpers
+	inline Quaternion EulerToQuaternion(float pitch, float yaw, float roll) {
+		float cy = cosf(yaw * 0.5f * 3.14159f / 180.0f);
+		float sy = sinf(yaw * 0.5f * 3.14159f / 180.0f);
+		float cp = cosf(pitch * 0.5f * 3.14159f / 180.0f);
+		float sp = sinf(pitch * 0.5f * 3.14159f / 180.0f);
+		float cr = cosf(roll * 0.5f * 3.14159f / 180.0f);
+		float sr = sinf(roll * 0.5f * 3.14159f / 180.0f);
+
+		Quaternion q;
+		q.w = cr * cp * cy + sr * sp * sy;
+		q.x = sr * cp * cy - cr * sp * sy;
+		q.y = cr * sp * cy + sr * cp * sy;
+		q.z = cr * cp * sy - sr * sp * cy;
+		return q;
+	}
+
+	inline Quaternion Slerp(const Quaternion& a, const Quaternion& b, float t) {
+		float dot = a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
+
+		if (dot < 0.0f) {
+			dot = -dot;
+		}
+
+		if (dot > 0.9995f) {
+			// Linear interpolation for very close quaternions
+			Quaternion result;
+			result.x = a.x + t * (b.x - a.x);
+			result.y = a.y + t * (b.y - a.y);
+			result.z = a.z + t * (b.z - a.z);
+			result.w = a.w + t * (b.w - a.w);
+
+			float len = sqrtf(result.x * result.x + result.y * result.y + result.z * result.z + result.w * result.w);
+			result.x /= len;
+			result.y /= len;
+			result.z /= len;
+			result.w /= len;
+			return result;
+		}
+
+		float theta = acosf(dot);
+		float sinTheta = sinf(theta);
+		float wa = sinf((1.0f - t) * theta) / sinTheta;
+		float wb = sinf(t * theta) / sinTheta;
+
+		Quaternion result;
+		result.x = wa * a.x + wb * b.x;
+		result.y = wa * a.y + wb * b.y;
+		result.z = wa * a.z + wb * b.z;
+		result.w = wa * a.w + wb * b.w;
+		return result;
+	}
 }

@@ -2,6 +2,7 @@
 #include "hooks.h"
 #include "gui/menu.h"
 #include <dxgi.h>
+#include "features/esp.h"
 
 namespace Hooks {
 	namespace D3D11 {
@@ -54,10 +55,15 @@ namespace Hooks {
 			if (g_ImGuiInitialized) {
 				ImGui_ImplDX11_NewFrame();
 				ImGui_ImplWin32_NewFrame();
+
+				//newframe
 				ImGui::NewFrame();
 
 				// Render menu
 				Menu::Render();
+
+				// Render ESP
+				Features::ESP::Render();
 
 				ImGui::Render();
 

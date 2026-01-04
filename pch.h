@@ -28,4 +28,7 @@
 // MinHook
 #include "MinHook.h"
 
+// Our SDK
+#include "sdk/offsets.h"
+
 #endif //PCH_H
