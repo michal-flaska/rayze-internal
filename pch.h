@@ -13,10 +13,12 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <d3d11.h>
+#include <Psapi.h>
 #include <cstdint>
 #include <string>
 #include <vector>
 #include <memory>
+#include <cmath>
 
 // ImGui
 #include "imgui.h"
