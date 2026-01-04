@@ -8,4 +8,4 @@ features:
 - aimbot (fov based)
 - wallhack
 
-note: youll probably have to update offsets and some shit, you can use il2cpp dumper by perfare to update it by yourself
+note: youll probably have to update offsets and some shit, you can use [il2cpp dumper by perfare](https://github.com/Perfare/Il2CppDumper) to update it by yourself
