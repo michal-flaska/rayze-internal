@@ -8,4 +8,12 @@ features:
 - aimbot (fov based)
 - wallhack
 
-note: youll probably have to update offsets and some shit, you can use il2cpp dumper by perfare to update it by yourself
+note: youll probably have to update offsets and some shit, you can use [il2cpp dumper by perfare](https://github.com/Perfare/Il2CppDumper) to update it by yourself
+
+```bash
+Il2CppDumper.exe <executable-file> <global-metadata> <output-directory>
+```
+
+```bash
+Il2CppDumper.exe "D:\SteamLibrary\steamapps\common\RAYZE\GameAssembly.dll" "D:\SteamLibrary\steamapps\common\RAYZE\RAYZE_Data\il2cpp_data\Metadata\global-metadata.dat" "C:\github-projects\rayze-internal\il2cpp-dumper"
+```
