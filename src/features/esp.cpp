@@ -1,56 +1,56 @@
 #include "pch.h"
 #include "features/esp.h"
 #include "gui/menu.h"
-#include "game/entities.h"
+#include "game/game_objects.h"
 
 namespace Features {
 	namespace ESP {
+		static std::vector<Game::Panel*> cachedPanels;
+		static DWORD lastPanelUpdate = 0;
+
 		void Initialize() {
 			printf("[ESP] Initialized\n");
 		}
 
+		void UpdatePanelCache() {
+			DWORD now = GetTickCount();
+			if (now - lastPanelUpdate < 1000) return; // Update every 1 second
+
+			cachedPanels.clear();
+
+			// Find all panels
+			auto panelObjects = Game::Objects::FindObjectsOfType<void>("Hyperstrange.WARPZ", "Panel");
+			for (auto obj : panelObjects) {
+				cachedPanels.push_back(new Game::Panel(obj));
+			}
+
+			lastPanelUpdate = now;
+			printf("[ESP] Found %zu panels\n", cachedPanels.size());
+		}
+
 		bool WorldToScreen(const Unity::Vector3& world, Unity::Vector2& screen) {
 			auto player = Game::Player::GetLocalPlayer();
-			if (!player) return false;
+			if (!player || !player->IsValid()) return false;
 
 			auto camera = player->GetCamera();
 			if (!camera) return false;
 
 			Unity::Vector3 screenPos = Game::WorldToScreen(camera, world);
 
-			// Check if behind camera (z < 0)
-			if (screenPos.z < 0.0f) return false;
-
-			// Get screen dimensions
-			ImGuiIO& io = ImGui::GetIO();
-			float screenWidth = io.DisplaySize.x;
-			float screenHeight = io.DisplaySize.y;
-
-			// Check if on screen
-			if (screenPos.x < 0 || screenPos.x > screenWidth ||
-				screenPos.y < 0 || screenPos.y > screenHeight) {
-				return false;
-			}
+			if (!Game::IsOnScreen(screenPos)) return false;
 
 			screen.x = screenPos.x;
 			screen.y = screenPos.y;
 			return true;
 		}
 
-		void DrawBox(const Unity::Vector3& worldPos, const Unity::Vector3& screenPos, const Unity::Color& color) {
-			// Simple 2D box
-			float boxSize = 20.0f;
-			ImVec2 min(screenPos.x - boxSize, screenPos.y - boxSize);
-			ImVec2 max(screenPos.x + boxSize, screenPos.y + boxSize);
+		void DrawBox(const Unity::Vector2& screenPos, float size, const Unity::Color& color) {
+			ImVec2 min(screenPos.x - size, screenPos.y - size);
+			ImVec2 max(screenPos.x + size, screenPos.y + size);
 
 			ImGui::GetBackgroundDrawList()->AddRect(
 				min, max,
-				IM_COL32(
-					(int)(color.r * 255),
-					(int)(color.g * 255),
-					(int)(color.b * 255),
-					(int)(color.a * 255)
-				),
+				IM_COL32((int)(color.r * 255), (int)(color.g * 255), (int)(color.b * 255), (int)(color.a * 255)),
 				0.0f, 0, 2.0f
 			);
 		}
@@ -59,12 +59,7 @@ namespace Features {
 			ImGui::GetBackgroundDrawList()->AddLine(
 				ImVec2(from.x, from.y),
 				ImVec2(to.x, to.y),
-				IM_COL32(
-					(int)(color.r * 255),
-					(int)(color.g * 255),
-					(int)(color.b * 255),
-					(int)(color.a * 255)
-				),
+				IM_COL32((int)(color.r * 255), (int)(color.g * 255), (int)(color.b * 255), (int)(color.a * 255)),
 				2.0f
 			);
 		}
@@ -72,12 +67,7 @@ namespace Features {
 		void DrawText(const Unity::Vector2& pos, const std::string& text, const Unity::Color& color) {
 			ImGui::GetBackgroundDrawList()->AddText(
 				ImVec2(pos.x, pos.y),
-				IM_COL32(
-					(int)(color.r * 255),
-					(int)(color.g * 255),
-					(int)(color.b * 255),
-					(int)(color.a * 255)
-				),
+				IM_COL32((int)(color.r * 255), (int)(color.g * 255), (int)(color.b * 255), (int)(color.a * 255)),
 				text.c_str()
 			);
 		}
@@ -86,40 +76,47 @@ namespace Features {
 			if (!Menu::Features::g_ESP) return;
 
 			auto player = Game::Player::GetLocalPlayer();
-			if (!player) return;
+			if (!player || !player->IsValid()) return;
 
-			// Get screen center for snaplines
+			// Update panel cache
+			UpdatePanelCache();
+
 			ImGuiIO& io = ImGui::GetIO();
 			Unity::Vector2 screenCenter(io.DisplaySize.x / 2.0f, io.DisplaySize.y);
 
-			// Draw finish panel
-			if (Menu::Features::g_ESPFinish) {
-				// TODO: Find FinishPanel instance
-				// For now, example with dummy position
-				// auto panels = Game::GetAllPanels();
-				// for (auto panel : panels) {
-				//     Unity::Vector3 worldPos = panel->GetPosition();
-				//     Unity::Vector2 screenPos;
-				//     if (WorldToScreen(worldPos, screenPos)) {
-				//         DrawBox(worldPos, Unity::Vector3(screenPos.x, screenPos.y, 0), Unity::Color(0, 1, 0, 1));
-				//         DrawText(screenPos, "FINISH", Unity::Color(0, 1, 0, 1));
-				//     }
-				// }
-			}
+			// Draw panels
+			for (auto panel : cachedPanels) {
+				if (!panel || !panel->IsValid()) continue;
 
-			// Draw targets
-			if (Menu::Features::g_ESPTargets) {
-				// TODO: Find all target/sphere objects
-				// Same pattern as above
-			}
+				Unity::Vector3 worldPos = panel->GetPosition();
+				Unity::Vector2 screenPos;
 
-			// Draw activation buttons
-			if (Menu::Features::g_ESPButtons) {
-				// TODO: Find button panels
+				if (!WorldToScreen(worldPos, screenPos)) continue;
+
+				// Determine panel type by checking class name or other properties
+				// For now, draw all panels as potential targets
+				Unity::Color color(1.0f, 0.0f, 0.0f, 1.0f); // Red
+
+				if (Menu::Features::g_ESPBoxes) {
+					DrawBox(screenPos, 20.0f, color);
+				}
+
+				if (Menu::Features::g_ESPSnaplines) {
+					DrawLine(screenCenter, screenPos, color);
+				}
+
+				// Draw distance
+				float dist = worldPos.Distance(player->GetPosition());
+				std::string distText = std::to_string((int)dist) + "m";
+				DrawText(Unity::Vector2(screenPos.x, screenPos.y - 25), distText, color);
 			}
 		}
 
 		void Shutdown() {
+			for (auto panel : cachedPanels) {
+				delete panel;
+			}
+			cachedPanels.clear();
 			printf("[ESP] Shut down\n");
 		}
 	}

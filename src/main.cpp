@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "hooks.h"
 #include "sdk/il2cpp.h"
+#include "game/game_objects.h"
 #include "features/speedhack.h"
 #include "features/noclip.h"
 #include "features/esp.h"
@@ -11,7 +12,9 @@ DWORD WINAPI MainThread(LPVOID param) {
 	FILE* f;
 	freopen_s(&f, "CONOUT$", "w", stdout);
 
-	printf("[RAYZE Internal] Initializing...\n");
+	printf("========================================\n");
+	printf("  RAYZE Internal - Educational Only\n");
+	printf("========================================\n");
 
 	if (MH_Initialize() != MH_OK) {
 		printf("[!] Failed to initialize MinHook\n");
@@ -20,12 +23,24 @@ DWORD WINAPI MainThread(LPVOID param) {
 	}
 
 	// Wait for GameAssembly
+	printf("[*] Waiting for GameAssembly.dll...\n");
 	while (!GetModuleHandleA("GameAssembly.dll")) {
 		Sleep(100);
 	}
+	printf("[+] GameAssembly.dll loaded\n");
 
+	// Initialize IL2CPP
 	if (!IL2CPP::Initialize()) {
 		printf("[!] Failed to initialize IL2CPP\n");
+		return 1;
+	}
+
+	// Initialize game objects
+	Game::Objects::Initialize();
+
+	// Initialize hooks
+	if (!Hooks::Init()) {
+		printf("[!] Failed to initialize hooks\n");
 		return 1;
 	}
 
@@ -35,31 +50,28 @@ DWORD WINAPI MainThread(LPVOID param) {
 	Features::ESP::Initialize();
 	Features::Aimbot::Initialize();
 
-	if (!Hooks::Init()) {
-		printf("[!] Failed to initialize hooks\n");
-		return 1;
-	}
+	printf("\n========================================\n");
+	printf("  Cheat loaded successfully!\n");
+	printf("  INSERT - Toggle menu\n");
+	printf("  END - Unload cheat\n");
+	printf("========================================\n\n");
 
-	printf("[+] Initialized successfully! Press END to unload\n");
-
-	// Main loop for features that need updates
-	while (!GetAsyncKeyState(VK_END)) {
+	// Main loop
+	while (!(GetAsyncKeyState(VK_END) & 1)) {
 		Features::Speedhack::Update();
 		Features::Noclip::Update();
 		Features::Aimbot::Update();
-		// ESP renders in Present hook
 
-		Sleep(10); // ~100 FPS update rate
+		Sleep(10);
 	}
 
-	printf("[*] Unloading...\n");
+	printf("\n[*] Unloading...\n");
 
 	// Cleanup
-	Features::Speedhack::Shutdown();
-	Features::Noclip::Shutdown();
-	Features::ESP::Shutdown();
 	Features::Aimbot::Shutdown();
-
+	Features::ESP::Shutdown();
+	Features::Noclip::Shutdown();
+	Features::Speedhack::Shutdown();
 	Hooks::Shutdown();
 	MH_Uninitialize();
 

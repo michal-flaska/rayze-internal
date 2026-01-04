@@ -1,61 +1,71 @@
 #include "pch.h"
 #include "features/aimbot.h"
 #include "gui/menu.h"
-#include "game/entities.h"
+#include "game/game_objects.h"
 
 namespace Features {
 	namespace Aimbot {
+		static std::vector<Game::Panel*> cachedTargets;
+		static DWORD lastTargetUpdate = 0;
+
 		void Initialize() {
 			printf("[Aimbot] Initialized\n");
+		}
+
+		void UpdateTargetCache() {
+			DWORD now = GetTickCount();
+			if (now - lastTargetUpdate < 500) return; // Update every 500ms
+
+			cachedTargets.clear();
+
+			auto targetObjects = Game::Objects::FindObjectsOfType<void>("Hyperstrange.WARPZ", "Panel");
+			for (auto obj : targetObjects) {
+				cachedTargets.push_back(new Game::Panel(obj));
+			}
+
+			lastTargetUpdate = now;
 		}
 
 		std::vector<Target> GetTargetsInFOV() {
 			std::vector<Target> targets;
 
 			auto player = Game::Player::GetLocalPlayer();
-			if (!player) return targets;
+			if (!player || !player->IsValid()) return targets;
 
 			auto camera = player->GetCamera();
 			if (!camera) return targets;
 
-			// TODO: Find all target objects (spheres, panels, etc.)
-			// For each target:
-			// 1. Get world position
-			// 2. Convert to screen space
-			// 3. Calculate FOV distance from screen center
-			// 4. Check if within FOV radius
-			// 5. Optionally: Check if visible (raycast)
+			UpdateTargetCache();
 
-			// Example structure:
-			// auto targetObjects = Game::GetAllTargets();
-			// for (auto targetObj : targetObjects) {
-			//     Unity::Vector3 worldPos = targetObj->GetPosition();
-			//     Unity::Vector3 screenPos3D = Game::WorldToScreen(camera, worldPos);
-			//     
-			//     if (screenPos3D.z < 0) continue; // Behind camera
-			//     
-			//     Unity::Vector2 screenPos(screenPos3D.x, screenPos3D.y);
-			//     
-			//     // Get screen center
-			//     ImGuiIO& io = ImGui::GetIO();
-			//     Unity::Vector2 screenCenter(io.DisplaySize.x / 2.0f, io.DisplaySize.y / 2.0f);
-			//     
-			//     // Calculate FOV distance
-			//     float dx = screenPos.x - screenCenter.x;
-			//     float dy = screenPos.y - screenCenter.y;
-			//     float fovDist = sqrtf(dx * dx + dy * dy);
-			//     
-			//     if (fovDist > Menu::Features::g_AimbotFOV) continue;
-			//     
-			//     Target t;
-			//     t.worldPos = worldPos;
-			//     t.screenPos = screenPos;
-			//     t.distance = worldPos.Distance(player->GetPosition());
-			//     t.fovDistance = fovDist;
-			//     t.isVisible = true; // TODO: Implement visibility check
-			//     
-			//     targets.push_back(t);
-			// }
+			ImGuiIO& io = ImGui::GetIO();
+			Unity::Vector2 screenCenter(io.DisplaySize.x / 2.0f, io.DisplaySize.y / 2.0f);
+
+			for (auto targetObj : cachedTargets) {
+				if (!targetObj || !targetObj->IsValid()) continue;
+
+				Unity::Vector3 worldPos = targetObj->GetPosition();
+				Unity::Vector3 screenPos3D = Game::WorldToScreen(camera, worldPos);
+
+				if (screenPos3D.z < 0) continue; // Behind camera
+
+				Unity::Vector2 screenPos(screenPos3D.x, screenPos3D.y);
+
+				// Calculate FOV distance
+				float dx = screenPos.x - screenCenter.x;
+				float dy = screenPos.y - screenCenter.y;
+				float fovDist = sqrtf(dx * dx + dy * dy);
+
+				if (fovDist > Menu::Features::g_AimbotFOV) continue;
+
+				Target t;
+				t.worldPos = worldPos;
+				t.screenPos = screenPos;
+				t.distance = worldPos.Distance(player->GetPosition());
+				t.fovDistance = fovDist;
+				t.isVisible = true; // TODO: Implement raycast visibility check
+
+				targets.push_back(t);
+			}
 
 			return targets;
 		}
@@ -71,7 +81,6 @@ namespace Features {
 				return a.fovDistance < b.fovDistance;
 				});
 
-			// Filter by visibility if enabled
 			if (Menu::Features::g_AimbotVisibleOnly) {
 				for (auto& target : targets) {
 					if (target.isVisible) {
@@ -86,68 +95,42 @@ namespace Features {
 
 		void AimAtTarget(const Target& target) {
 			auto player = Game::Player::GetLocalPlayer();
-			if (!player) return;
+			if (!player || !player->IsValid()) return;
 
-			auto cameraTransform = player->GetCameraTransform();
-			if (!cameraTransform) return;
-
-			// Get current camera position
-			using GetPosition_t = Unity::Vector3(__fastcall*)(Unity::Transform*);
-			static auto getPos = reinterpret_cast<GetPosition_t>(
-				(uintptr_t)GetModuleHandleA("GameAssembly.dll") + Offsets::Transform::get_position
-				);
-
-			Unity::Vector3 cameraPos = getPos(cameraTransform);
-
-			// Calculate direction to target
+			Unity::Vector3 cameraPos = player->GetCameraPosition();
 			Unity::Vector3 direction = target.worldPos - cameraPos;
-			float distance = sqrtf(direction.x * direction.x + direction.y * direction.y + direction.z * direction.z);
 
+			float distance = sqrtf(direction.x * direction.x + direction.y * direction.y + direction.z * direction.z);
 			if (distance < 0.001f) return;
 
-			// Normalize direction
+			// Normalize
 			direction.x /= distance;
 			direction.y /= distance;
 			direction.z /= distance;
 
-			// Calculate target rotation (pitch and yaw)
-			float pitch = asinf(-direction.y) * (180.0f / 3.14159f);
-			float yaw = atan2f(direction.x, direction.z) * (180.0f / 3.14159f);
+			// Calculate target angles
+			float pitch = asinf(-direction.y) * (180.0f / 3.14159265359f);
+			float yaw = atan2f(direction.x, direction.z) * (180.0f / 3.14159265359f);
+
+			// Convert to quaternion
+			Unity::Quaternion targetRot = Unity::EulerToQuaternion(pitch, yaw, 0);
 
 			// Get current rotation
-			using GetRotation_t = Unity::Quaternion(__fastcall*)(Unity::Transform*);
-			static auto getRot = reinterpret_cast<GetRotation_t>(
-				(uintptr_t)GetModuleHandleA("GameAssembly.dll") + Offsets::Transform::get_rotation
-				);
-
-			Unity::Quaternion currentRot = getRot(cameraTransform);
-
-			// Convert current quaternion to euler angles (simplified)
-			// For smooth aiming, we'd lerp between current and target angles
+			Unity::Quaternion currentRot = player->GetCameraRotation();
 
 			// Apply smoothing
 			float smoothFactor = 1.0f / Menu::Features::g_AimbotSmooth;
+			Unity::Quaternion smoothedRot = Unity::Slerp(currentRot, targetRot, smoothFactor);
 
-			// TODO: Implement proper quaternion -> euler -> interpolated euler -> quaternion
-			// For now, this is a simplified version
-
-			// Set new rotation
-			using SetRotation_t = void(__fastcall*)(Unity::Transform*, Unity::Quaternion);
-			static auto setRot = reinterpret_cast<SetRotation_t>(
-				(uintptr_t)GetModuleHandleA("GameAssembly.dll") + Offsets::Transform::set_rotation
-				);
-
-			// Create target quaternion from euler angles
-			// Unity::Quaternion targetQuat = EulerToQuaternion(pitch, yaw, 0);
-			// Unity::Quaternion smoothedQuat = Slerp(currentRot, targetQuat, smoothFactor);
-			// setRot(cameraTransform, smoothedQuat);
+			// Set rotation
+			player->SetCameraRotation(smoothedRot);
 		}
 
 		void Update() {
 			if (!Menu::Features::g_Aimbot) return;
 
-			// Check if aiming (you might want to bind this to a key)
-			if (GetAsyncKeyState(VK_RBUTTON) & 0x8000) { // Right mouse button
+			// Bind to right mouse button (you can change this)
+			if (GetAsyncKeyState(VK_RBUTTON) & 0x8000) {
 				Target* target = GetBestTarget();
 				if (target) {
 					AimAtTarget(*target);
@@ -156,6 +139,10 @@ namespace Features {
 		}
 
 		void Shutdown() {
+			for (auto target : cachedTargets) {
+				delete target;
+			}
+			cachedTargets.clear();
 			printf("[Aimbot] Shut down\n");
 		}
 	}

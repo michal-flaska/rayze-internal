@@ -1,46 +1,28 @@
 #include "pch.h"
 #include "features/noclip.h"
 #include "gui/menu.h"
-#include "game/entities.h"
+#include "game/game_objects.h"
 
 namespace Features {
 	namespace Noclip {
-		// Hook CharacterController or Rigidbody collision
-		// For Unity IL2CPP, we need to hook the collision detection
-
-		typedef bool(__fastcall* OnControllerColliderHit_t)(void*, void*);
-		static OnControllerColliderHit_t oOnControllerColliderHit = nullptr;
-
-		bool __fastcall hkOnControllerColliderHit(void* thisPtr, void* hit) {
-			if (Menu::Features::g_Noclip) {
-				// Block collision
-				return false;
-			}
-			return oOnControllerColliderHit(thisPtr, hit);
-		}
-
 		void Initialize() {
-			// TODO: Find and hook CharacterController collision methods
-			// This requires finding the vtable or method address
-			printf("[Noclip] Initialized\n");
+			printf("[Noclip] Initialized (debug mode - uses Player.DebugNoClip)\n");
 		}
 
 		void Update() {
-			if (!Menu::Features::g_Noclip) return;
+			// RAYZE has built-in debug noclip we can enable
+			// Check Player class - it has OnDebugNoClipChanged event and DebugNoClip property
 
-			// Alternative approach: Disable collider directly
 			auto player = Game::Player::GetLocalPlayer();
-			if (!player) return;
+			if (!player || !player->IsValid()) return;
 
-			// Method 1: Set player position directly (teleport through walls)
-			// Method 2: Disable physics layers
-			// Method 3: Hook collision detection (implemented above)
+			// For now, this is a placeholder
+			// You'd need to find the debug component and set the noclip flag
+			// Or hook movement/collision methods
 		}
 
 		void Shutdown() {
-			if (oOnControllerColliderHit) {
-				MH_DisableHook((void*)oOnControllerColliderHit);
-			}
+			printf("[Noclip] Shut down\n");
 		}
 	}
 }

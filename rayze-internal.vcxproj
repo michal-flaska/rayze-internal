@@ -166,6 +166,7 @@
     <ClInclude Include="src\features\noclip.h" />
     <ClInclude Include="src\features\speedhack.h" />
     <ClInclude Include="src\game\entities.h" />
+    <ClInclude Include="src\game\game_objects.h" />
     <ClInclude Include="src\gui\menu.h" />
     <ClInclude Include="src\hooks.h" />
     <ClInclude Include="src\utils\memory.h" />
@@ -233,6 +234,7 @@
     <ClCompile Include="src\features\noclip.cpp" />
     <ClCompile Include="src\features\speedhack.cpp" />
     <ClCompile Include="src\game\entities.cpp" />
+    <ClCompile Include="src\game\game_objects.cpp" />
     <ClCompile Include="src\gui\menu.cpp" />
     <ClCompile Include="src\hooks.cpp" />
     <ClCompile Include="src\main.cpp" />
