@@ -17,5 +17,3 @@ Il2CppDumper.exe <executable-file> <global-metadata> <output-directory>
 ```bash
 Il2CppDumper.exe "D:\SteamLibrary\steamapps\common\RAYZE\GameAssembly.dll" "D:\SteamLibrary\steamapps\common\RAYZE\RAYZE_Data\il2cpp_data\Metadata\global-metadata.dat" "C:\github-projects\rayze-internal\il2cpp-dumper"
 ```
-
-create dll project in vs

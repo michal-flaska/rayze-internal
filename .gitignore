@@ -1,3 +1,8 @@
+!./il2cpp-dumper/DummyDll/*.dll
+!./il2cpp-dumper/DummyDll/*
+!./il2cpp-dumper/*
+!./il2cpp-dumper/
+
 # Created by https://www.toptal.com/developers/gitignore/api/c++,visualstudio,visualstudiocode,windows
 # Edit at https://www.toptal.com/developers/gitignore?templates=c++,visualstudio,visualstudiocode,windows
 
