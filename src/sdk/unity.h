@@ -2,6 +2,13 @@
 #include "pch.h"
 
 namespace Unity {
+	struct Vector2 {
+		float x, y;
+
+		Vector2() : x(0), y(0) {}
+		Vector2(float x, float y) : x(x), y(y) {}
+	};
+
 	struct Vector3 {
 		float x, y, z;
 
@@ -22,7 +29,14 @@ namespace Unity {
 
 	struct Quaternion {
 		float x, y, z, w;
+
+		Quaternion() : x(0), y(0), z(0), w(1) {}
+		Quaternion(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
 	};
+
+	// Forward declarations of Unity engine types
+	struct Camera {};
+	struct Transform {};
 
 	struct Matrix4x4 {
 		float m[4][4];

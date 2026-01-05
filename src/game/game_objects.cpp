@@ -97,7 +97,8 @@ namespace Game {
 
 	Unity::Camera* Player::GetCamera() {
 		if (!instance) return nullptr;
-		return *reinterpret_cast<Unity::Camera**>((uintptr_t)instance + Offsets::Player::Camera);
+		// <Camera>k__BackingField
+		return *reinterpret_cast<Unity::Camera**>((uintptr_t)instance + 0x100);
 	}
 
 	Unity::Transform* Player::GetCameraTransform() {
@@ -117,7 +118,7 @@ namespace Game {
 
 		using GetPosition_t = Unity::Vector3(__fastcall*)(Unity::Transform*);
 		static auto fn = reinterpret_cast<GetPosition_t>(
-			(uintptr_t)GetModuleHandleA("GameAssembly.dll") + Offsets::Transform::get_position
+			(uintptr_t)GetModuleHandleA("GameAssembly.dll") + Offsets::Unity::Transform_get_position
 			);
 
 		return fn(transform);
@@ -129,7 +130,7 @@ namespace Game {
 
 		using GetPosition_t = Unity::Vector3(__fastcall*)(Unity::Transform*);
 		static auto fn = reinterpret_cast<GetPosition_t>(
-			(uintptr_t)GetModuleHandleA("GameAssembly.dll") + Offsets::Transform::get_position
+			(uintptr_t)GetModuleHandleA("GameAssembly.dll") + Offsets::Unity::Transform_get_position
 			);
 
 		return fn(transform);
@@ -141,7 +142,7 @@ namespace Game {
 
 		using GetRotation_t = Unity::Quaternion(__fastcall*)(Unity::Transform*);
 		static auto fn = reinterpret_cast<GetRotation_t>(
-			(uintptr_t)GetModuleHandleA("GameAssembly.dll") + Offsets::Transform::get_rotation
+			(uintptr_t)GetModuleHandleA("GameAssembly.dll") + Offsets::Unity::Transform_get_rotation
 			);
 
 		return fn(transform);
@@ -153,7 +154,7 @@ namespace Game {
 
 		using SetRotation_t = void(__fastcall*)(Unity::Transform*, Unity::Quaternion);
 		static auto fn = reinterpret_cast<SetRotation_t>(
-			(uintptr_t)GetModuleHandleA("GameAssembly.dll") + Offsets::Transform::set_rotation
+			(uintptr_t)GetModuleHandleA("GameAssembly.dll") + Offsets::Unity::Transform_set_rotation
 			);
 
 		fn(transform, rot);
@@ -161,15 +162,20 @@ namespace Game {
 
 	bool Player::IsActive() {
 		if (!instance) return false;
-		return *reinterpret_cast<bool*>((uintptr_t)instance + Offsets::Player::IsActive);
+		// Use the backing field name as generated
+		return *reinterpret_cast<bool*>((uintptr_t)instance + 0x108); // <IsActive>k__BackingField
 	}
 
 	float Player::GetCurrentSpeed() {
 		if (!instance) return 0.0f;
-		// ObscuredFloat - we'll just read raw value for now
-		// TODO: Decrypt ObscuredFloat properly
-		uintptr_t speedPtr = (uintptr_t)instance + Offsets::Player::CurrentSpeed;
-		return *reinterpret_cast<float*>(speedPtr);
+
+		// Get the movement component
+		void* movementComponent = *reinterpret_cast<void**>((uintptr_t)instance + Offsets::Player::_movementComponent);
+		if (!movementComponent) return 0.0f;
+
+		// Read _currentAcceleration which is a plain float (not obfuscated)
+		uintptr_t speedFieldPtr = (uintptr_t)movementComponent + Offsets::PlayerMovementComponent::_currentAcceleration;
+		return *reinterpret_cast<float*>(speedFieldPtr);
 	}
 
 	// Panel implementation
@@ -184,7 +190,7 @@ namespace Game {
 
 		using GetPosition_t = Unity::Vector3(__fastcall*)(Unity::Transform*);
 		static auto fn = reinterpret_cast<GetPosition_t>(
-			(uintptr_t)GetModuleHandleA("GameAssembly.dll") + Offsets::Transform::get_position
+			(uintptr_t)GetModuleHandleA("GameAssembly.dll") + Offsets::Unity::Transform_get_position
 			);
 
 		return fn(transform);
@@ -196,7 +202,7 @@ namespace Game {
 
 		using WorldToScreenPoint_t = Unity::Vector3(__fastcall*)(Unity::Camera*, Unity::Vector3, int);
 		static auto fn = reinterpret_cast<WorldToScreenPoint_t>(
-			(uintptr_t)GetModuleHandleA("GameAssembly.dll") + Offsets::Camera::WorldToScreenPoint
+			(uintptr_t)GetModuleHandleA("GameAssembly.dll") + Offsets::Unity::Camera_WorldToScreenPoint
 			);
 
 		return fn(camera, worldPos, 0); // MonoOrStereoscopicEye = 0

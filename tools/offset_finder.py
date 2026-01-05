@@ -95,23 +95,25 @@ class IL2CPPOffsetFinder:
 		"""Manually search for specific class names we know exist"""
 		print(f"\n[*] Manual search for known classes...")
 
-		# Format: (class_name, expected_namespace)
+		# Format: (class_name, expected_namespace, search_pattern_override)
+		# search_pattern_override allows finding specific classes with unique patterns
 		known_classes = [
-			("Player", "Hyperstrange.WARPZ"),
-			("Camera", "UnityEngine"),
-			("Transform", "UnityEngine"),
-			("TimeManager", "Hyperstrange.WARPZ"),
-			("FinishPanel", "Hyperstrange.WARPZ"),
-			("Panel", "Hyperstrange.WARPZ"),
-			("PlayerMovementComponent", "Hyperstrange.WARPZ"),
-			("PlayerWarpComponent", "Hyperstrange.WARPZ"),
-			("PlayerComboComponent", "Hyperstrange.WARPZ"),
+			("Player", "Hyperstrange.WARPZ", None),
+			("TimeManager", "Hyperstrange.WARPZ", None),
+			("FinishPanel", "Hyperstrange.WARPZ", None),
+			("Panel", "Hyperstrange.WARPZ", None),
+			("PlayerMovementComponent", "Hyperstrange.WARPZ", None),
+			("PlayerWarpComponent", "Hyperstrange.WARPZ", None),
+			("PlayerComboComponent", "Hyperstrange.WARPZ", None),
 		]
 
 		results = {}
 
-		for class_name, expected_namespace in known_classes:
-			class_content = self.find_class_full(class_name)
+		for item in known_classes:
+			class_name = item[0]
+			expected_namespace = item[1]
+
+			class_content = self.find_class_full(class_name, expected_namespace)
 			if class_content:
 				namespace_match = re.search(r'// Namespace: ([^\n]+)', class_content)
 				namespace = namespace_match.group(1) if namespace_match else ""
@@ -174,7 +176,7 @@ class IL2CPPOffsetFinder:
 		matches.sort(key=lambda x: x[1], reverse=True)
 		return matches
 
-	def find_class_full(self, class_name: str) -> Optional[str]:
+	def find_class_full(self, class_name: str, expected_namespace: str = None) -> Optional[str]:
 		"""Find full class definition with fields and methods"""
 		# Match only standalone class definitions (not nested classes)
 		pattern = rf'(// Namespace:.*?\n(?:public |private |internal )?class {re.escape(class_name)}\s*(?::|//|\n|\{{))'
@@ -184,20 +186,26 @@ class IL2CPPOffsetFinder:
 		if not matches:
 			return None
 
-		# If multiple matches, prefer non-nested classes
+		# If multiple matches, prefer the one with the correct namespace
 		best_match = None
 		for match in matches:
 			start_pos = match.start()
 
-			# Check if this is a nested class by looking backwards
-			# Nested classes have more indentation before "class" keyword
-			lines_before = self.dump_content[:start_pos].split('\n')
-			if len(lines_before) > 0:
-				last_line = lines_before[-1]
-				# If the line before "class" starts with more than one tab, it's nested
-				if last_line.count('\t') <= 1:
+			# Extract namespace from this match
+			namespace_match = re.search(r'// Namespace: ([^\n]+)', self.dump_content[start_pos:start_pos+200])
+			if namespace_match and expected_namespace:
+				if namespace_match.group(1) == expected_namespace:
 					best_match = match
 					break
+			elif not expected_namespace:
+				# Check if this is a nested class by looking backwards
+				lines_before = self.dump_content[:start_pos].split('\n')
+				if len(lines_before) > 0:
+					last_line = lines_before[-1]
+					# If the line before "class" starts with more than one tab, it's nested
+					if last_line.count('\t') <= 1:
+						best_match = match
+						break
 
 		if not best_match:
 			best_match = matches[0]  # Fallback to first match
@@ -347,7 +355,63 @@ class IL2CPPOffsetFinder:
 
 		return results
 
-	def generate_header(self, output_path: str):
+	def extract_unity_methods(self) -> Dict:
+		"""Extract important Unity method addresses directly from dump.cs"""
+		print(f"\n[*] Extracting Unity methods...")
+
+		methods = {}
+
+		# Find WorldToScreenPoint
+		pattern = r'// RVA: (0x[0-9A-F]+) Offset: (0x[0-9A-F]+) VA: (0x[0-9A-F]+)\s*public Vector3 WorldToScreenPoint\(Vector3 position\)'
+		match = re.search(pattern, self.dump_content)
+		if match:
+			rva, offset, va = match.groups()
+			methods['Camera_WorldToScreenPoint'] = {'rva': rva, 'offset': offset, 'va': va}
+			print(f"  [+] Found Camera.WorldToScreenPoint @ {offset}")
+
+		# Find Transform.get_position
+		pattern = r'// RVA: (0x[0-9A-F]+) Offset: (0x[0-9A-F]+) VA: (0x[0-9A-F]+)\s*public Vector3 get_position\(\)'
+		match = re.search(pattern, self.dump_content)
+		if match:
+			rva, offset, va = match.groups()
+			methods['Transform_get_position'] = {'rva': rva, 'offset': offset, 'va': va}
+			print(f"  [+] Found Transform.get_position @ {offset}")
+
+		# Find Transform.set_position
+		pattern = r'// RVA: (0x[0-9A-F]+) Offset: (0x[0-9A-F]+) VA: (0x[0-9A-F]+)\s*public void set_position\(Vector3'
+		match = re.search(pattern, self.dump_content)
+		if match:
+			rva, offset, va = match.groups()
+			methods['Transform_set_position'] = {'rva': rva, 'offset': offset, 'va': va}
+			print(f"  [+] Found Transform.set_position @ {offset}")
+
+		# Find Transform.get_rotation
+		pattern = r'// RVA: (0x[0-9A-F]+) Offset: (0x[0-9A-F]+) VA: (0x[0-9A-F]+)\s*public Quaternion get_rotation\(\)'
+		match = re.search(pattern, self.dump_content)
+		if match:
+			rva, offset, va = match.groups()
+			methods['Transform_get_rotation'] = {'rva': rva, 'offset': offset, 'va': va}
+			print(f"  [+] Found Transform.get_rotation @ {offset}")
+
+		# Find Transform.set_rotation
+		pattern = r'// RVA: (0x[0-9A-F]+) Offset: (0x[0-9A-F]+) VA: (0x[0-9A-F]+)\s*public void set_rotation\(Quaternion'
+		match = re.search(pattern, self.dump_content)
+		if match:
+			rva, offset, va = match.groups()
+			methods['Transform_set_rotation'] = {'rva': rva, 'offset': offset, 'va': va}
+			print(f"  [+] Found Transform.set_rotation @ {offset}")
+
+		# Find Camera.get_main
+		pattern = r'// RVA: (0x[0-9A-F]+) Offset: (0x[0-9A-F]+) VA: (0x[0-9A-F]+)\s*public static Camera get_main\(\)'
+		match = re.search(pattern, self.dump_content)
+		if match:
+			rva, offset, va = match.groups()
+			methods['Camera_get_main'] = {'rva': rva, 'offset': offset, 'va': va}
+			print(f"  [+] Found Camera.get_main @ {offset}")
+
+		return methods
+
+	def generate_header(self, output_path: str, unity_methods: Dict = None):
 		"""Generate C++ header with offsets"""
 		header = """#pragma once
 // Auto-generated offsets from IL2CPP dump
@@ -359,6 +423,16 @@ class IL2CPPOffsetFinder:
 namespace Offsets {
 """
 
+		# Add Unity methods first if available
+		if unity_methods:
+			header += "\n\t// UnityEngine Methods (extracted directly)\n"
+			header += "\tnamespace Unity {\n"
+			for method_name, method_data in unity_methods.items():
+				offset = method_data.get('offset', '0x0')
+				header += f"\t\tconstexpr uintptr_t {method_name} = {offset};\n"
+			header += "\t}\n"
+
+		# Add game classes
 		for class_name, class_data in self.offsets.items():
 			namespace = class_data.get('namespace', '')
 			header += f"\n\t// {namespace}.{class_name}\n"
@@ -452,22 +526,25 @@ def main():
 
 	finder.load_files()
 
+	# Extract Unity methods (Transform, Camera, etc.)
+	unity_methods = finder.extract_unity_methods()
+
 	# Manual search for known classes (highest priority)
 	game_classes = finder.manual_search_classes()
 
-	# Smart search for additional classes (panels, buttons, etc.)
-	smart_results = finder.smart_search()
+	# Skip smart search - it's too unreliable and finds wrong classes
+	# smart_results = finder.smart_search()
 
-	# Merge results (manual takes priority)
-	finder.offsets = {**smart_results, **game_classes}
+	# Use only manual results
+	finder.offsets = game_classes
 
 	# Generate outputs
-	finder.generate_header("src/sdk/offsets.h")
+	finder.generate_header("src/sdk/offsets.h", unity_methods)
 	finder.save_json("tools/offsets.json")
 	finder.generate_summary_report("tools/OFFSET_REPORT.md")
 
 	print("\n" + "=" * 60)
-	print(f"Summary: {len(finder.offsets)} classes found")
+	print(f"Summary: {len(finder.offsets)} game classes + {len(unity_methods)} Unity methods")
 	print("=" * 60)
 
 if __name__ == "__main__":
