@@ -27,13 +27,7 @@ namespace Features {
 			auto panelObjects = Game::Objects::FindObjectsOfType<void>("Hyperstrange.WARPZ", "Panel");
 			for (auto obj : panelObjects) {
 				if (obj) {
-					Game::Panel* panel = new Game::Panel(obj);
-					// Only cache active (unhit) panels
-					if (panel->IsActive()) {
-						cachedPanels.push_back(panel);
-					} else {
-						delete panel;  // Don't leak memory for inactive panels
-					}
+					cachedPanels.push_back(new Game::Panel(obj));
 				}
 			}
 
