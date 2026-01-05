@@ -2,6 +2,7 @@
 #include "features/aimbot.h"
 #include "gui/menu.h"
 #include "game/game_objects.h"
+#include <algorithm>
 
 namespace Features {
 	namespace Aimbot {
