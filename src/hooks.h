@@ -17,6 +17,12 @@ namespace Hooks {
 		HRESULT __stdcall hkResizeBuffers(IDXGISwapChain* pSwapChain, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags);
 	}
 
+	// WndProc hook
+	namespace WndProc {
+		inline WNDPROC oWndProc = nullptr;
+		LRESULT CALLBACK hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	}
+
 	// Game hooks - we'll add these after analyzing dump.cs
 	namespace Game {
 		// Example: Hook Camera.WorldToScreenPoint or similar
