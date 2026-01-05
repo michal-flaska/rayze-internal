@@ -48,31 +48,26 @@ namespace Game {
 	std::vector<T*> Objects::FindObjectsOfType(const char* namespaze, const char* className) {
 		std::vector<T*> result;
 
-		__try {
-			void* klass = IL2CPP::GetClassFromName(namespaze, className);
-			if (!klass) return result;
+		void* klass = IL2CPP::GetClassFromName(namespaze, className);
+		if (!klass) return result;
 
-			void* objArray = GetObjectsOfType(klass);
-			if (!objArray) return result;
+		void* objArray = GetObjectsOfType(klass);
+		if (!objArray) return result;
 
-			// Cast to Il2CppArray
-			auto* arr = reinterpret_cast<Unity::Il2CppArray<void*>*>(objArray);
-			if (!arr) return result;
+		// Cast to Il2CppArray
+		auto* arr = reinterpret_cast<Unity::Il2CppArray<void*>*>(objArray);
+		if (!arr) return result;
 
-			// Validate array before accessing
-			if (arr->max_length > 10000) {
-				printf("[!] Suspicious array length: %zu\n", arr->max_length);
-				return result;
-			}
-
-			for (size_t i = 0; i < arr->max_length; i++) {
-				if (arr->items[i]) {
-					result.push_back(reinterpret_cast<T*>(arr->items[i]));
-				}
-			}
+		// Validate array before accessing
+		if (arr->max_length > 10000) {
+			printf("[!] Suspicious array length: %zu\n", arr->max_length);
+			return result;
 		}
-		__except (EXCEPTION_EXECUTE_HANDLER) {
-			printf("[!] Exception in FindObjectsOfType(%s.%s): 0x%X\n", namespaze, className, GetExceptionCode());
+
+		for (size_t i = 0; i < arr->max_length; i++) {
+			if (arr->items[i]) {
+				result.push_back(reinterpret_cast<T*>(arr->items[i]));
+			}
 		}
 
 		return result;
