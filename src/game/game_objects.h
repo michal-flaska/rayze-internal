@@ -65,6 +65,7 @@ namespace Game {
 
 		Unity::Transform* GetTransform();
 		Unity::Vector3 GetPosition();
+		bool IsActive(); // Returns true if panel hasn't been hit yet
 	};
 
 	// Helper functions

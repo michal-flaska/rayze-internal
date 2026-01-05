@@ -126,13 +126,35 @@ namespace Game {
 
 	Unity::Transform* Player::GetCameraTransform() {
 		if (!instance) return nullptr;
-		return *reinterpret_cast<Unity::Transform**>((uintptr_t)instance + Offsets::Player::_cameraTransform);
+
+		__try {
+			Unity::Transform* transform = *reinterpret_cast<Unity::Transform**>((uintptr_t)instance + Offsets::Player::_cameraTransform);
+			// Basic validation
+			if ((uintptr_t)transform < 0x10000 || (uintptr_t)transform > 0x7FFFFFFFFFFF) {
+				return nullptr;
+			}
+			return transform;
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER) {
+			return nullptr;
+		}
 	}
 
 	Unity::Transform* Player::GetTransform() {
 		if (!instance) return nullptr;
-		// Component base class has transform at 0x10
-		return *reinterpret_cast<Unity::Transform**>((uintptr_t)instance + 0x10);
+
+		__try {
+			// Component base class has transform at 0x10
+			Unity::Transform* transform = *reinterpret_cast<Unity::Transform**>((uintptr_t)instance + 0x10);
+			// Basic validation
+			if ((uintptr_t)transform < 0x10000 || (uintptr_t)transform > 0x7FFFFFFFFFFF) {
+				return nullptr;
+			}
+			return transform;
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER) {
+			return nullptr;
+		}
 	}
 
 	Unity::Vector3 Player::GetPosition() {
@@ -158,36 +180,57 @@ namespace Game {
 		auto transform = GetCameraTransform();
 		if (!transform) return Unity::Vector3();
 
-		using GetPosition_t = Unity::Vector3(__fastcall*)(Unity::Transform*);
-		static auto fn = reinterpret_cast<GetPosition_t>(
-			(uintptr_t)GetModuleHandleA("GameAssembly.dll") + Offsets::Unity::Transform_get_position
-			);
+		__try {
+			using GetPosition_t = Unity::Vector3(__fastcall*)(Unity::Transform*);
+			static auto fn = reinterpret_cast<GetPosition_t>(
+				(uintptr_t)GetModuleHandleA("GameAssembly.dll") + Offsets::Unity::Transform_get_position
+				);
 
-		return fn(transform);
+			if (!fn) return Unity::Vector3();
+
+			return fn(transform);
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER) {
+			return Unity::Vector3();
+		}
 	}
 
 	Unity::Quaternion Player::GetCameraRotation() {
 		auto transform = GetCameraTransform();
 		if (!transform) return Unity::Quaternion();
 
-		using GetRotation_t = Unity::Quaternion(__fastcall*)(Unity::Transform*);
-		static auto fn = reinterpret_cast<GetRotation_t>(
-			(uintptr_t)GetModuleHandleA("GameAssembly.dll") + Offsets::Unity::Transform_get_rotation
-			);
+		__try {
+			using GetRotation_t = Unity::Quaternion(__fastcall*)(Unity::Transform*);
+			static auto fn = reinterpret_cast<GetRotation_t>(
+				(uintptr_t)GetModuleHandleA("GameAssembly.dll") + Offsets::Unity::Transform_get_rotation
+				);
 
-		return fn(transform);
+			if (!fn) return Unity::Quaternion();
+
+			return fn(transform);
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER) {
+			return Unity::Quaternion();
+		}
 	}
 
 	void Player::SetCameraRotation(const Unity::Quaternion& rot) {
 		auto transform = GetCameraTransform();
 		if (!transform) return;
 
-		using SetRotation_t = void(__fastcall*)(Unity::Transform*, Unity::Quaternion);
-		static auto fn = reinterpret_cast<SetRotation_t>(
-			(uintptr_t)GetModuleHandleA("GameAssembly.dll") + Offsets::Unity::Transform_set_rotation
-			);
+		__try {
+			using SetRotation_t = void(__fastcall*)(Unity::Transform*, Unity::Quaternion);
+			static auto fn = reinterpret_cast<SetRotation_t>(
+				(uintptr_t)GetModuleHandleA("GameAssembly.dll") + Offsets::Unity::Transform_set_rotation
+				);
 
-		fn(transform, rot);
+			if (!fn) return;
+
+			fn(transform, rot);
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER) {
+			printf("[!] Exception in SetCameraRotation\n");
+		}
 	}
 
 	bool Player::IsActive() {
@@ -210,7 +253,30 @@ namespace Game {
 	// Panel implementation
 	Unity::Transform* Panel::GetTransform() {
 		if (!instance) return nullptr;
-		return *reinterpret_cast<Unity::Transform**>((uintptr_t)instance + 0x10);
+
+		__try {
+			Unity::Transform* transform = *reinterpret_cast<Unity::Transform**>((uintptr_t)instance + 0x10);
+			// Basic validation
+			if ((uintptr_t)transform < 0x10000 || (uintptr_t)transform > 0x7FFFFFFFFFFF) {
+				return nullptr;
+			}
+			return transform;
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER) {
+			return nullptr;
+		}
+	}
+
+	bool Panel::IsActive() {
+		if (!instance) return false;
+
+		__try {
+			// _isActive is at offset 0x50 according to dump.cs
+			return *reinterpret_cast<bool*>((uintptr_t)instance + 0x50);
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER) {
+			return false;
+		}
 	}
 
 	Unity::Vector3 Panel::GetPosition() {

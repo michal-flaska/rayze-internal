@@ -17,14 +17,29 @@ namespace Features {
 			DWORD now = GetTickCount();
 			if (now - lastTargetUpdate < 500) return; // Update every 500ms
 
+			// Clear old targets first
+			for (auto target : cachedTargets) {
+				delete target;
+			}
 			cachedTargets.clear();
 
 			auto targetObjects = Game::Objects::FindObjectsOfType<void>("Hyperstrange.WARPZ", "Panel");
 			for (auto obj : targetObjects) {
-				cachedTargets.push_back(new Game::Panel(obj));
+				if (obj) {
+					Game::Panel* panel = new Game::Panel(obj);
+					// Only cache active (unhit) panels
+					if (panel->IsActive()) {
+						cachedTargets.push_back(panel);
+					} else {
+						delete panel;  // Don't leak memory for inactive panels
+					}
+				}
 			}
 
 			lastTargetUpdate = now;
+			if (!targetObjects.empty()) {
+				printf("[Aimbot] Found %zu active targets out of %zu total\n", cachedTargets.size(), targetObjects.size());
+			}
 		}
 
 		std::vector<Target> GetTargetsInFOV() {
@@ -130,12 +145,26 @@ namespace Features {
 		void Update() {
 			if (!Menu::Features::g_Aimbot) return;
 
-			// Bind to right mouse button (you can change this)
-			if (GetAsyncKeyState(VK_RBUTTON) & 0x8000) {
+			auto player = Game::Player::GetLocalPlayer();
+			if (!player || !player->IsValid()) return;
+
+			// Bind to ALT key (changed from RMB which is brake in-game)
+			if (GetAsyncKeyState(VK_MENU) & 0x8000) {
+				static bool loggedOnce = false;
+				if (!loggedOnce) {
+					printf("[Aimbot] ALT key pressed, finding target...\n");
+					loggedOnce = true;
+				}
+
 				Target* target = GetBestTarget();
 				if (target) {
+					printf("[Aimbot] Aiming at target (FOV dist: %.1f)\n", target->fovDistance);
 					AimAtTarget(*target);
 				}
+			} else {
+				// Reset log flag when key is released
+				static bool loggedOnce = false;
+				loggedOnce = false;
 			}
 		}
 
