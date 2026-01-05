@@ -10,10 +10,6 @@ features:
 
 note: youll probably have to update offsets and some shit, you can use [il2cpp dumper by perfare](https://github.com/Perfare/Il2CppDumper) to update it by yourself
 
-```bash
-Il2CppDumper.exe <executable-file> <global-metadata> <output-directory>
-```
+---
 
-```bash
-Il2CppDumper.exe "D:\SteamLibrary\steamapps\common\RAYZE\GameAssembly.dll" "D:\SteamLibrary\steamapps\common\RAYZE\RAYZE_Data\il2cpp_data\Metadata\global-metadata.dat" "C:\github-projects\rayze-internal\il2cpp-dumper"
-```
+im giving up, i just dont have the skills to do game cheats anymore. like, what the fuck am i even doing... Even AI couldnt help me, not because its unethical, but because it just straight up gave up after fucking up for straight 20 updates of the project. i should have been doing something else than this fuckass cheat dev
