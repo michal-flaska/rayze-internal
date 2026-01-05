@@ -4,6 +4,8 @@
 #include <dxgi.h>
 #include "features/esp.h"
 
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 namespace Hooks {
 	namespace D3D11 {
 		// ImGui state
@@ -11,6 +13,7 @@ namespace Hooks {
 		static ID3D11Device* g_pd3dDevice = nullptr;
 		static ID3D11DeviceContext* g_pd3dDeviceContext = nullptr;
 		static ID3D11RenderTargetView* g_mainRenderTargetView = nullptr;
+		static HWND g_hWnd = nullptr;
 
 		void CleanupRenderTarget() {
 			if (g_mainRenderTargetView) {
@@ -36,16 +39,20 @@ namespace Hooks {
 					// Get window from swap chain
 					DXGI_SWAP_CHAIN_DESC sd;
 					pSwapChain->GetDesc(&sd);
+					g_hWnd = sd.OutputWindow;
 
 					// Initialize ImGui
 					ImGui::CreateContext();
 					ImGuiIO& io = ImGui::GetIO();
 					io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
-					ImGui_ImplWin32_Init(sd.OutputWindow);
+					ImGui_ImplWin32_Init(g_hWnd);
 					ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
 
 					CreateRenderTarget(pSwapChain);
+
+					// Hook WndProc
+					WndProc::oWndProc = (WNDPROC)SetWindowLongPtr(g_hWnd, GWLP_WNDPROC, (LONG_PTR)WndProc::hkWndProc);
 
 					g_ImGuiInitialized = true;
 					printf("[+] ImGui initialized\n");
@@ -79,6 +86,17 @@ namespace Hooks {
 			HRESULT result = oResizeBuffers(pSwapChain, BufferCount, Width, Height, NewFormat, SwapChainFlags);
 			CreateRenderTarget(pSwapChain);
 			return result;
+		}
+	}
+
+	namespace WndProc {
+		LRESULT CALLBACK hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+			// Forward to ImGui first
+			if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+				return true;
+
+			// Call original WndProc
+			return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
 		}
 	}
 
@@ -153,6 +171,11 @@ namespace Hooks {
 		MH_RemoveHook(MH_ALL_HOOKS);
 
 		if (D3D11::g_ImGuiInitialized) {
+			// Restore original WndProc
+			if (WndProc::oWndProc && D3D11::g_hWnd) {
+				SetWindowLongPtr(D3D11::g_hWnd, GWLP_WNDPROC, (LONG_PTR)WndProc::oWndProc);
+			}
+
 			ImGui_ImplDX11_Shutdown();
 			ImGui_ImplWin32_Shutdown();
 			ImGui::DestroyContext();
