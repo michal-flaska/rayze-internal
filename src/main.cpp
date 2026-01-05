@@ -56,13 +56,23 @@ DWORD WINAPI MainThread(LPVOID param) {
 	printf("  END - Unload cheat\n");
 	printf("========================================\n\n");
 
+	// Wait for game to fully initialize
+	printf("[*] Waiting 3 seconds for game to fully load...\n");
+	Sleep(3000);
+	printf("[+] Starting main loop\n");
+
 	// Main loop
 	while (!(GetAsyncKeyState(VK_END) & 1)) {
-		Features::Speedhack::Update();
-		Features::Noclip::Update();
-		Features::Aimbot::Update();
+		__try {
+			Features::Speedhack::Update();
+			Features::Noclip::Update();
+			Features::Aimbot::Update();
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER) {
+			printf("[!] Exception in main loop: 0x%X\n", GetExceptionCode());
+		}
 
-		Sleep(10);
+		Sleep(100); // Reduced frequency to 10 Hz instead of 100 Hz
 	}
 
 	printf("\n[*] Unloading...\n");
