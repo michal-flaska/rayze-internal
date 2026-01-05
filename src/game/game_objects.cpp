@@ -92,6 +92,12 @@ namespace Game {
 			return g_cachedPlayer;
 		}
 
+		// Clear invalid cached player
+		if (g_cachedPlayer) {
+			delete g_cachedPlayer;
+			g_cachedPlayer = nullptr;
+		}
+
 		// Find new instance
 		void* playerInst = Objects::FindObjectOfType<void>("Hyperstrange.WARPZ", "Player");
 		if (playerInst) {
@@ -133,12 +139,19 @@ namespace Game {
 		auto transform = GetTransform();
 		if (!transform) return Unity::Vector3();
 
-		using GetPosition_t = Unity::Vector3(__fastcall*)(Unity::Transform*);
-		static auto fn = reinterpret_cast<GetPosition_t>(
-			(uintptr_t)GetModuleHandleA("GameAssembly.dll") + Offsets::Unity::Transform_get_position
-			);
+		__try {
+			using GetPosition_t = Unity::Vector3(__fastcall*)(Unity::Transform*);
+			static auto fn = reinterpret_cast<GetPosition_t>(
+				(uintptr_t)GetModuleHandleA("GameAssembly.dll") + Offsets::Unity::Transform_get_position
+				);
 
-		return fn(transform);
+			if (!fn) return Unity::Vector3();
+
+			return fn(transform);
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER) {
+			return Unity::Vector3();
+		}
 	}
 
 	Unity::Vector3 Player::GetCameraPosition() {

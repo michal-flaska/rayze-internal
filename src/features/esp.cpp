@@ -17,6 +17,10 @@ namespace Features {
 			DWORD now = GetTickCount();
 			if (now - lastPanelUpdate < 1000) return; // Update every 1 second
 
+			// Clear old panels first
+			for (auto panel : cachedPanels) {
+				delete panel;
+			}
 			cachedPanels.clear();
 
 			// Find all panels - this is already protected in FindObjectsOfType
