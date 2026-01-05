@@ -1,0 +1,913 @@
+{
+  "Player": {
+    "namespace": "Hyperstrange.WARPZ",
+    "fields": {
+      "OnStart": {
+        "type": "Action<Player>",
+        "offset": "0x0",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "OnFinish": {
+        "type": "Action<Player>",
+        "offset": "0x8",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "OnDeath": {
+        "type": "Action<Player>",
+        "offset": "0x10",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "OnFinishWarpSuccess": {
+        "type": "Action<PlayerWarpComponent>",
+        "offset": "0x40",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "OnButtonSuccess": {
+        "type": "Action<PlayerWarpComponent>",
+        "offset": "0x48",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "OnWarpSuccess": {
+        "type": "Action<PlayerWarpComponent>",
+        "offset": "0x50",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "OnWarpFail": {
+        "type": "Action<PlayerWarpComponent>",
+        "offset": "0x58",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "OnWarpFinderUpdate": {
+        "type": "Action<PlayerWarpComponent>",
+        "offset": "0x60",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "OnComboIncremented": {
+        "type": "Action<PlayerComboComponent>",
+        "offset": "0x68",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "OnComboTimeOutUpdate": {
+        "type": "Action<PlayerComboComponent>",
+        "offset": "0x70",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "OnComboTimedOut": {
+        "type": "Action<PlayerComboComponent>",
+        "offset": "0x78",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "OnOxygenEnd": {
+        "type": "Action<PlayerOxygenComponent>",
+        "offset": "0x80",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "OnOxygenUpdate": {
+        "type": "Action<PlayerOxygenComponent>",
+        "offset": "0x88",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "OnLowOxygenPulse": {
+        "type": "Action<PlayerOxygenView>",
+        "offset": "0x90",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "OnBreak": {
+        "type": "Action<PlayerBreakComponent>",
+        "offset": "0x98",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "OnRespawn": {
+        "type": "Action<Player>",
+        "offset": "0xA0",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "OnDebugNoClipChanged": {
+        "type": "Action",
+        "offset": "0xA8",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "OnDebugViewChanged": {
+        "type": "Action",
+        "offset": "0xB0",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "OnDebugComboIncremented": {
+        "type": "Action",
+        "offset": "0xB8",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "OnDebugTimeScaleChanged": {
+        "type": "Action",
+        "offset": "0xC0",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "OnDebugOxygenChanged": {
+        "type": "Action",
+        "offset": "0xC8",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "_cameraTransform": {
+        "type": "Transform",
+        "offset": "0xD0",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "_playerSpawnPoint": {
+        "type": "PlayerSpawnPoint",
+        "offset": "0xD8",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "_movementComponent": {
+        "type": "PlayerMovementComponent",
+        "offset": "0xE0",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "_timeComponent": {
+        "type": "PlayerTimeComponent",
+        "offset": "0xE8",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "_statsComponent": {
+        "type": "PlayerStatsComponent",
+        "offset": "0xF0",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "_debugComponent": {
+        "type": "PlayerDebugComponent",
+        "offset": "0xF8",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "Camerak__BackingField": {
+        "type": "Camera",
+        "offset": "0x100",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "IsActivek__BackingField": {
+        "type": "bool",
+        "offset": "0x108",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "WarpComponentk__BackingField": {
+        "type": "PlayerWarpComponent",
+        "offset": "0x110",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "ComboComponentk__BackingField": {
+        "type": "PlayerComboComponent",
+        "offset": "0x118",
+        "rva": "0x0",
+        "va": "0x0"
+      }
+    },
+    "methods": {
+      "Awake": {
+        "return_type": "void",
+        "offset": "0x138C7C0",
+        "rva": "0x138DFC0",
+        "va": "0x18138DFC0"
+      },
+      "OnEnable": {
+        "return_type": "void",
+        "offset": "0x138CCD0",
+        "rva": "0x138E4D0",
+        "va": "0x18138E4D0"
+      },
+      "OnDisable": {
+        "return_type": "void",
+        "offset": "0x138CA00",
+        "rva": "0x138E200",
+        "va": "0x18138E200"
+      },
+      "OnLevelPrepareStart": {
+        "return_type": "void",
+        "offset": "0x138CFB0",
+        "rva": "0x138E7B0",
+        "va": "0x18138E7B0"
+      },
+      "OnLevelStart": {
+        "return_type": "void",
+        "offset": "0x138D0C0",
+        "rva": "0x138E8C0",
+        "va": "0x18138E8C0"
+      },
+      "OnLevelPrepareEnd": {
+        "return_type": "void",
+        "offset": "0x138CFA0",
+        "rva": "0x138E7A0",
+        "va": "0x18138E7A0"
+      },
+      "OnFinishWarp": {
+        "return_type": "void",
+        "offset": "0x138CFA0",
+        "rva": "0x138E7A0",
+        "va": "0x18138E7A0"
+      },
+      "get_Camera": {
+        "return_type": "Camera",
+        "offset": "0x2DA4F0",
+        "rva": "0x2DBCF0",
+        "va": "0x1802DBCF0"
+      },
+      "set_Camera": {
+        "return_type": "void",
+        "offset": "0x2DA9C0",
+        "rva": "0x2DC1C0",
+        "va": "0x1802DC1C0"
+      },
+      "get_CameraTransform": {
+        "return_type": "Transform",
+        "offset": "0x585F20",
+        "rva": "0x587720",
+        "va": "0x180587720"
+      },
+      "get_IsActive": {
+        "return_type": "bool",
+        "offset": "0x2DA510",
+        "rva": "0x2DBD10",
+        "va": "0x1802DBD10"
+      },
+      "set_IsActive": {
+        "return_type": "void",
+        "offset": "0x2DA9E0",
+        "rva": "0x2DC1E0",
+        "va": "0x1802DC1E0"
+      },
+      "get_IsMoving": {
+        "return_type": "bool",
+        "offset": "0x138E180",
+        "rva": "0x138F980",
+        "va": "0x18138F980"
+      },
+      "get_MinimalSpeed": {
+        "return_type": "bool",
+        "offset": "0x138E1B0",
+        "rva": "0x138F9B0",
+        "va": "0x18138F9B0"
+      },
+      "get_CurrentSpeed": {
+        "return_type": "ObscuredFloat",
+        "offset": "0x138E0C0",
+        "rva": "0x138F8C0",
+        "va": "0x18138F8C0"
+      },
+      "get_SpeedStat": {
+        "return_type": "SpeedStat",
+        "offset": "0x138E210",
+        "rva": "0x138FA10",
+        "va": "0x18138FA10"
+      },
+      "get_CurrentTime": {
+        "return_type": "TimeStat",
+        "offset": "0x138E100",
+        "rva": "0x138F900",
+        "va": "0x18138F900"
+      },
+      "get_WarpComponent": {
+        "return_type": "PlayerWarpComponent",
+        "offset": "0x2F9510",
+        "rva": "0x2FAD10",
+        "va": "0x1802FAD10"
+      },
+      "set_WarpComponent": {
+        "return_type": "void",
+        "offset": "0x2DAB10",
+        "rva": "0x2DC310",
+        "va": "0x1802DC310"
+      },
+      "get_ComboComponent": {
+        "return_type": "PlayerComboComponent",
+        "offset": "0x4F8F50",
+        "rva": "0x4FA750",
+        "va": "0x1804FA750"
+      },
+      "set_ComboComponent": {
+        "return_type": "void",
+        "offset": "0x4FB120",
+        "rva": "0x4FC920",
+        "va": "0x1804FC920"
+      },
+      "GetLastRunInfo": {
+        "return_type": "LevelRunInfo",
+        "offset": "0x138C9B0",
+        "rva": "0x138E1B0",
+        "va": "0x18138E1B0"
+      },
+      "GetAchievementsStats": {
+        "return_type": "LevelAchievementsStats",
+        "offset": "0x138C970",
+        "rva": "0x138E170",
+        "va": "0x18138E170"
+      },
+      "get_DebugNoClip": {
+        "return_type": "bool",
+        "offset": "0x138E140",
+        "rva": "0x138F940",
+        "va": "0x18138F940"
+      },
+      "get_DebugHiddenView": {
+        "return_type": "bool",
+        "offset": "0x138E120",
+        "rva": "0x138F920",
+        "va": "0x18138F920"
+      },
+      "get_DebugOxygenDisabled": {
+        "return_type": "bool",
+        "offset": "0x138E160",
+        "rva": "0x138F960",
+        "va": "0x18138F960"
+      },
+      "_ctor": {
+        "return_type": "void",
+        "offset": "0x138D270",
+        "rva": "0x138EA70",
+        "va": "0x18138EA70"
+      },
+      "_cctor": {
+        "return_type": "void",
+        "offset": "0x138D0D0",
+        "rva": "0x138E8D0",
+        "va": "0x18138E8D0"
+      }
+    },
+    "content_preview": "// Namespace: Hyperstrange.WARPZ\npublic class Player : BaseBehaviour // TypeDefIndex: 7939\n{\n\t// Fields\n\tpublic static Action<Player> OnStart; // 0x0\n\tpublic static Action<Player> OnFinish; // 0x8\n\tpublic static Action<Player> OnDeath; // 0x10\n\tpublic Action<PlayerWarpComponent> OnFinishWarpSuccess; // 0x40\n\tpublic Action<PlayerWarpComponent> OnButtonSuccess; // 0x48\n\tpublic Action<PlayerWarpCompo"
+  },
+  "TimeManager": {
+    "namespace": "Hyperstrange.WARPZ",
+    "fields": {
+      "OnTimeScaleChanged": {
+        "type": "Action<float>",
+        "offset": "0x0",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "CurrentTimeScalek__BackingField": {
+        "type": "float",
+        "offset": "0x8",
+        "rva": "0x0",
+        "va": "0x0"
+      }
+    },
+    "methods": {
+      "SetTimeScale": {
+        "return_type": "void",
+        "offset": "0x1345B80",
+        "rva": "0x1347380",
+        "va": "0x181347380"
+      },
+      "get_CurrentTimeScale": {
+        "return_type": "float",
+        "offset": "0x1345DC0",
+        "rva": "0x13475C0",
+        "va": "0x1813475C0"
+      },
+      "set_CurrentTimeScale": {
+        "return_type": "void",
+        "offset": "0x1345E20",
+        "rva": "0x1347620",
+        "va": "0x181347620"
+      },
+      "_ctor": {
+        "return_type": "void",
+        "offset": "0x1345D50",
+        "rva": "0x1347550",
+        "va": "0x181347550"
+      },
+      "_cctor": {
+        "return_type": "void",
+        "offset": "0x1345C70",
+        "rva": "0x1347470",
+        "va": "0x181347470"
+      }
+    },
+    "content_preview": "// Namespace: Hyperstrange.WARPZ\npublic class TimeManager : Singleton<TimeManager> // TypeDefIndex: 7986\n{\n\t// Fields\n\tpublic static Action<float> OnTimeScaleChanged; // 0x0\n\t[CompilerGeneratedAttribute] // RVA: 0xC7370 Offset: 0xC6770 VA: 0x1800C7370\n\tprivate static float <CurrentTimeScale>k__BackingField; // 0x8\n\n\t// Properties\n\tpublic static float CurrentTimeScale { get; set; }\n\n\t// Methods\n\n\t/"
+  },
+  "FinishPanel": {
+    "namespace": "Hyperstrange.WARPZ",
+    "fields": {},
+    "methods": {
+      "_ctor": {
+        "return_type": "void",
+        "offset": "0x1357010",
+        "rva": "0x1358810",
+        "va": "0x181358810"
+      }
+    },
+    "content_preview": "// Namespace: Hyperstrange.WARPZ\npublic class FinishPanel : Panel // TypeDefIndex: 7868\n{\n\t// Methods\n\n\t// RVA: 0x1358770 Offset: 0x1356F70 VA: 0x181358770 Slot: 9\n\tpublic override void Hit(Player player) { }\n\n\t// RVA: 0x254B90 Offset: 0x253390 VA: 0x180254B90 Slot: 10\n\tpublic override void ResetState() { }\n\n\t// RVA: 0x1358810 Offset: 0x1357010 VA: 0x181358810\n\tpublic void .ctor() { }\n}"
+  },
+  "PlayerMovementComponent": {
+    "namespace": "Hyperstrange.WARPZ",
+    "fields": {
+      "_minSpeed": {
+        "type": "float",
+        "offset": "0x48",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "_deltaSpeed": {
+        "type": "float",
+        "offset": "0x4C",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "_acceleration": {
+        "type": "float",
+        "offset": "0x50",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "_breakDeltaSpeed": {
+        "type": "float",
+        "offset": "0x54",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "_breakDeceleration": {
+        "type": "float",
+        "offset": "0x58",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "_idleDeceleation": {
+        "type": "float",
+        "offset": "0x5C",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "_idleDecelerationDelay": {
+        "type": "float",
+        "offset": "0x60",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "_speedBeforeSlowMotion": {
+        "type": "float",
+        "offset": "0x64",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "_currentAcceleration": {
+        "type": "float",
+        "offset": "0x68",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "_idleDecelerate": {
+        "type": "bool",
+        "offset": "0x6C",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "_idleTween": {
+        "type": "Tween",
+        "offset": "0x70",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "_direction": {
+        "type": "Vector3",
+        "offset": "0x78",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "_speedStat": {
+        "type": "SpeedStat",
+        "offset": "0x84",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "IsMovingk__BackingField": {
+        "type": "bool",
+        "offset": "0x88",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "CurrentSpeedk__BackingField": {
+        "type": "ObscuredFloat",
+        "offset": "0x8C",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "TargetSpeedk__BackingField": {
+        "type": "ObscuredFloat",
+        "offset": "0xA4",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "MaxSpeedk__BackingField": {
+        "type": "ObscuredFloat",
+        "offset": "0xBC",
+        "rva": "0x0",
+        "va": "0x0"
+      }
+    },
+    "methods": {
+      "OnEnable": {
+        "return_type": "void",
+        "offset": "0x1388710",
+        "rva": "0x1389F10",
+        "va": "0x181389F10"
+      },
+      "OnDisable": {
+        "return_type": "void",
+        "offset": "0x1388330",
+        "rva": "0x1389B30",
+        "va": "0x181389B30"
+      },
+      "OnFinish": {
+        "return_type": "void",
+        "offset": "0x1388AF0",
+        "rva": "0x138A2F0",
+        "va": "0x18138A2F0"
+      },
+      "OnRespawn": {
+        "return_type": "void",
+        "offset": "0x1388E00",
+        "rva": "0x138A600",
+        "va": "0x18138A600"
+      },
+      "OnWarpSuccess": {
+        "return_type": "void",
+        "offset": "0x1389010",
+        "rva": "0x138A810",
+        "va": "0x18138A810"
+      },
+      "HandleIdle": {
+        "return_type": "void",
+        "offset": "0x1387E30",
+        "rva": "0x1389630",
+        "va": "0x181389630"
+      },
+      "OnWarpFail": {
+        "return_type": "void",
+        "offset": "0x1389000",
+        "rva": "0x138A800",
+        "va": "0x18138A800"
+      },
+      "OnBreak": {
+        "return_type": "void",
+        "offset": "0x1388320",
+        "rva": "0x1389B20",
+        "va": "0x181389B20"
+      },
+      "DecreaseSpeed": {
+        "return_type": "void",
+        "offset": "0x1387D60",
+        "rva": "0x1389560",
+        "va": "0x181389560"
+      },
+      "Accelerate": {
+        "return_type": "void",
+        "offset": "0x13879A0",
+        "rva": "0x13891A0",
+        "va": "0x1813891A0"
+      },
+      "Decelerate": {
+        "return_type": "void",
+        "offset": "0x1387C90",
+        "rva": "0x1389490",
+        "va": "0x181389490"
+      },
+      "NoClipUpdate": {
+        "return_type": "void",
+        "offset": "0x1388040",
+        "rva": "0x1389840",
+        "va": "0x181389840"
+      },
+      "SpeedUpdate": {
+        "return_type": "void",
+        "offset": "0x1389540",
+        "rva": "0x138AD40",
+        "va": "0x18138AD40"
+      },
+      "AccererationUpdate": {
+        "return_type": "void",
+        "offset": "0x1387A70",
+        "rva": "0x1389270",
+        "va": "0x181389270"
+      },
+      "PositionUpdate": {
+        "return_type": "void",
+        "offset": "0x1389450",
+        "rva": "0x138AC50",
+        "va": "0x18138AC50"
+      },
+      "get_SpeedStat": {
+        "return_type": "SpeedStat",
+        "offset": "0x1389760",
+        "rva": "0x138AF60",
+        "va": "0x18138AF60"
+      },
+      "get_IsMoving": {
+        "return_type": "bool",
+        "offset": "0x10C9130",
+        "rva": "0x10CA930",
+        "va": "0x1810CA930"
+      },
+      "set_IsMoving": {
+        "return_type": "void",
+        "offset": "0x489A70",
+        "rva": "0x48B270",
+        "va": "0x18048B270"
+      },
+      "get_MinimalSpeed": {
+        "return_type": "bool",
+        "offset": "0x1389710",
+        "rva": "0x138AF10",
+        "va": "0x18138AF10"
+      },
+      "get_CurrentSpeed": {
+        "return_type": "ObscuredFloat",
+        "offset": "0x13896D0",
+        "rva": "0x138AED0",
+        "va": "0x18138AED0"
+      },
+      "set_CurrentSpeed": {
+        "return_type": "void",
+        "offset": "0x13897D0",
+        "rva": "0x138AFD0",
+        "va": "0x18138AFD0"
+      },
+      "get_TargetSpeed": {
+        "return_type": "ObscuredFloat",
+        "offset": "0x13897B0",
+        "rva": "0x138AFB0",
+        "va": "0x18138AFB0"
+      },
+      "set_TargetSpeed": {
+        "return_type": "void",
+        "offset": "0x1389810",
+        "rva": "0x138B010",
+        "va": "0x18138B010"
+      },
+      "get_MaxSpeed": {
+        "return_type": "ObscuredFloat",
+        "offset": "0x13896F0",
+        "rva": "0x138AEF0",
+        "va": "0x18138AEF0"
+      },
+      "set_MaxSpeed": {
+        "return_type": "void",
+        "offset": "0x13897F0",
+        "rva": "0x138AFF0",
+        "va": "0x18138AFF0"
+      },
+      "_ctor": {
+        "return_type": "void",
+        "offset": "0x1389640",
+        "rva": "0x138AE40",
+        "va": "0x18138AE40"
+      }
+    },
+    "content_preview": "// Namespace: Hyperstrange.WARPZ\npublic class PlayerMovementComponent : ChildBehaviour<Player>, IUpdateListener, IFixedUpdateListener // TypeDefIndex: 7949\n{\n\t// Fields\n\t[HeaderAttribute] // RVA: 0x212DA0 Offset: 0x2121A0 VA: 0x180212DA0\n\t[SerializeField] // RVA: 0x212DA0 Offset: 0x2121A0 VA: 0x180212DA0\n\tprivate float _minSpeed; // 0x48\n\t[SerializeField] // RVA: 0xC7370 Offset: 0xC6770 VA: 0x1800"
+  },
+  "PlayerWarpComponent": {
+    "namespace": "Hyperstrange.WARPZ",
+    "fields": {
+      "_hitInfo": {
+        "type": "RaycastHit",
+        "offset": "0x48",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "_currentHittable": {
+        "type": "IHittable",
+        "offset": "0x78",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "CurrentWarpableDurationk__BackingField": {
+        "type": "float",
+        "offset": "0x80",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "CurrentPanelk__BackingField": {
+        "type": "Panel",
+        "offset": "0x88",
+        "rva": "0x0",
+        "va": "0x0"
+      }
+    },
+    "methods": {
+      "OnEnable": {
+        "return_type": "void",
+        "offset": "0x132E7C0",
+        "rva": "0x132FFC0",
+        "va": "0x18132FFC0"
+      },
+      "OnDisable": {
+        "return_type": "void",
+        "offset": "0x132E6B0",
+        "rva": "0x132FEB0",
+        "va": "0x18132FEB0"
+      },
+      "OnWarpDown": {
+        "return_type": "void",
+        "offset": "0x132EB30",
+        "rva": "0x1330330",
+        "va": "0x181330330"
+      },
+      "HandleWarp": {
+        "return_type": "void",
+        "offset": "0x132E510",
+        "rva": "0x132FD10",
+        "va": "0x18132FD10"
+      },
+      "get_LastHitInfo": {
+        "return_type": "RaycastHit",
+        "offset": "0x132EBE0",
+        "rva": "0x13303E0",
+        "va": "0x1813303E0"
+      },
+      "get_WarpableFound": {
+        "return_type": "bool",
+        "offset": "0x132EC10",
+        "rva": "0x1330410",
+        "va": "0x181330410"
+      },
+      "get_CurrentWarpableDuration": {
+        "return_type": "float",
+        "offset": "0x132EBD0",
+        "rva": "0x13303D0",
+        "va": "0x1813303D0"
+      },
+      "set_CurrentWarpableDuration": {
+        "return_type": "void",
+        "offset": "0x132EC60",
+        "rva": "0x1330460",
+        "va": "0x181330460"
+      },
+      "get_CurrentPanel": {
+        "return_type": "Panel",
+        "offset": "0x3FA760",
+        "rva": "0x3FBF60",
+        "va": "0x1803FBF60"
+      },
+      "set_CurrentPanel": {
+        "return_type": "void",
+        "offset": "0x6583E0",
+        "rva": "0x659BE0",
+        "va": "0x180659BE0"
+      },
+      "_ctor": {
+        "return_type": "void",
+        "offset": "0x132EB90",
+        "rva": "0x1330390",
+        "va": "0x181330390"
+      }
+    },
+    "content_preview": "// Namespace: Hyperstrange.WARPZ\npublic class PlayerWarpComponent : ChildBehaviour<Player>, IUpdateListener // TypeDefIndex: 7957\n{\n\t// Fields\n\tprivate RaycastHit _hitInfo; // 0x48\n\tprivate IHittable _currentHittable; // 0x78\n\t[CompilerGeneratedAttribute] // RVA: 0xC7370 Offset: 0xC6770 VA: 0x1800C7370\n\tprivate float <CurrentWarpableDuration>k__BackingField; // 0x80\n\t[CompilerGeneratedAttribute] /"
+  },
+  "PlayerComboComponent": {
+    "namespace": "Hyperstrange.WARPZ",
+    "fields": {
+      "_comboTimeout": {
+        "type": "float",
+        "offset": "0x48",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "_activeCombo": {
+        "type": "bool",
+        "offset": "0x4C",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "_lastComboIncrementTimeStamp": {
+        "type": "float",
+        "offset": "0x50",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "ComboTimeoutProgressk__BackingField": {
+        "type": "float",
+        "offset": "0x54",
+        "rva": "0x0",
+        "va": "0x0"
+      },
+      "ComboCountk__BackingField": {
+        "type": "int",
+        "offset": "0x58",
+        "rva": "0x0",
+        "va": "0x0"
+      }
+    },
+    "methods": {
+      "OnEnable": {
+        "return_type": "void",
+        "offset": "0x1382F70",
+        "rva": "0x1384770",
+        "va": "0x181384770"
+      },
+      "OnDisable": {
+        "return_type": "void",
+        "offset": "0x1382C60",
+        "rva": "0x1384460",
+        "va": "0x181384460"
+      },
+      "OnRespawn": {
+        "return_type": "void",
+        "offset": "0x1383280",
+        "rva": "0x1384A80",
+        "va": "0x181384A80"
+      },
+      "OnWarpSuccess": {
+        "return_type": "void",
+        "offset": "0x1383360",
+        "rva": "0x1384B60",
+        "va": "0x181384B60"
+      },
+      "OnWarpFail": {
+        "return_type": "void",
+        "offset": "0x1382BD0",
+        "rva": "0x13843D0",
+        "va": "0x1813843D0"
+      },
+      "OnBreak": {
+        "return_type": "void",
+        "offset": "0x1382BD0",
+        "rva": "0x13843D0",
+        "va": "0x1813843D0"
+      },
+      "BreakCombo": {
+        "return_type": "void",
+        "offset": "0x1382BD0",
+        "rva": "0x13843D0",
+        "va": "0x1813843D0"
+      },
+      "IncrementCombo": {
+        "return_type": "void",
+        "offset": "0x1382BE0",
+        "rva": "0x13843E0",
+        "va": "0x1813843E0"
+      },
+      "get_ComboTimeout": {
+        "return_type": "float",
+        "offset": "0xDB1780",
+        "rva": "0xDB2F80",
+        "va": "0x180DB2F80"
+      },
+      "get_ComboTimeoutProgress": {
+        "return_type": "float",
+        "offset": "0x71D7F0",
+        "rva": "0x71EFF0",
+        "va": "0x18071EFF0"
+      },
+      "set_ComboTimeoutProgress": {
+        "return_type": "void",
+        "offset": "0x71D8D0",
+        "rva": "0x71F0D0",
+        "va": "0x18071F0D0"
+      },
+      "get_ComboCount": {
+        "return_type": "int",
+        "offset": "0x5B7B80",
+        "rva": "0x5B9380",
+        "va": "0x1805B9380"
+      },
+      "set_ComboCount": {
+        "return_type": "void",
+        "offset": "0x5B8010",
+        "rva": "0x5B9810",
+        "va": "0x1805B9810"
+      },
+      "_ctor": {
+        "return_type": "void",
+        "offset": "0x1383370",
+        "rva": "0x1384B70",
+        "va": "0x181384B70"
+      }
+    },
+    "content_preview": "// Namespace: Hyperstrange.WARPZ\npublic class PlayerComboComponent : ChildBehaviour<Player>, IUpdateListener // TypeDefIndex: 7945\n{\n\t// Fields\n\t[SerializeField] // RVA: 0xC7370 Offset: 0xC6770 VA: 0x1800C7370\n\tprivate float _comboTimeout; // 0x48\n\tprivate bool _activeCombo; // 0x4C\n\tprivate float _lastComboIncrementTimeStamp; // 0x50\n\t[CompilerGeneratedAttribute] // RVA: 0xC7370 Offset: 0xC6770 V"
+  }
+}
