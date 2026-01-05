@@ -241,7 +241,15 @@ class IL2CPPOffsetFinder:
 			# Clean up field name (remove array brackets, etc.)
 			field_name_clean = field_name.split('[')[0]
 
-			fields[field_name_clean] = {
+			# Sanitize field name for C++ (remove < > and other invalid chars)
+			# <Camera>k__BackingField -> Camera_k__BackingField
+			field_name_sanitized = field_name_clean.replace('<', '').replace('>', '').replace('.', '_')
+
+			# Skip if it starts with an invalid character after sanitization
+			if not field_name_sanitized or not (field_name_sanitized[0].isalpha() or field_name_sanitized[0] == '_'):
+				continue
+
+			fields[field_name_sanitized] = {
 				'type': field_type,
 				'offset': offset,
 				'rva': '0x0',
@@ -257,7 +265,15 @@ class IL2CPPOffsetFinder:
 
 		for match in re.finditer(pattern, class_content):
 			rva, offset, va, return_type, method_name = match.groups()
-			methods[method_name] = {
+
+			# Sanitize method name for C++ (remove . and other invalid chars)
+			method_name_sanitized = method_name.replace('.', '_')
+
+			# Skip if it starts with an invalid character
+			if not method_name_sanitized or not (method_name_sanitized[0].isalpha() or method_name_sanitized[0] == '_'):
+				continue
+
+			methods[method_name_sanitized] = {
 				'return_type': return_type,
 				'offset': offset,
 				'rva': rva,

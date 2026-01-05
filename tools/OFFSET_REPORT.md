@@ -68,14 +68,14 @@ public class TimeManager : Singleton<TimeManager> // TypeDefIndex: 7986
 
 ### Fields (2)
 - `OnTimeScaleChanged`: Action<float> @ 0x0
-- `<CurrentTimeScale>k__BackingField`: float @ 0x8
+- `CurrentTimeScalek__BackingField`: float @ 0x8
 
 ### Methods (5)
 - `SetTimeScale()`: void @ 0x1345B80
 - `get_CurrentTimeScale()`: float @ 0x1345DC0
 - `set_CurrentTimeScale()`: void @ 0x1345E20
-- `.ctor()`: void @ 0x1345D50
-- `.cctor()`: void @ 0x1345C70
+- `_ctor()`: void @ 0x1345D50
+- `_cctor()`: void @ 0x1345C70
 
 ---
 
@@ -101,7 +101,7 @@ public class FinishPanel : Panel // TypeDefIndex: 7868
 ```
 
 ### Methods (1)
-- `.ctor()`: void @ 0x1357010
+- `_ctor()`: void @ 0x1357010
 
 ---
 
@@ -167,8 +167,8 @@ public class PlayerWarpComponent : ChildBehaviour<Player>, IUpdateListener // Ty
 ### Fields (4)
 - `_hitInfo`: RaycastHit @ 0x48
 - `_currentHittable`: IHittable @ 0x78
-- `<CurrentWarpableDuration>k__BackingField`: float @ 0x80
-- `<CurrentPanel>k__BackingField`: Panel @ 0x88
+- `CurrentWarpableDurationk__BackingField`: float @ 0x80
+- `CurrentPanelk__BackingField`: Panel @ 0x88
 
 ### Methods (11)
 - `OnEnable()`: void @ 0x132E7C0
@@ -205,8 +205,8 @@ public class PlayerComboComponent : ChildBehaviour<Player>, IUpdateListener // T
 - `_comboTimeout`: float @ 0x48
 - `_activeCombo`: bool @ 0x4C
 - `_lastComboIncrementTimeStamp`: float @ 0x50
-- `<ComboTimeoutProgress>k__BackingField`: float @ 0x54
-- `<ComboCount>k__BackingField`: int @ 0x58
+- `ComboTimeoutProgressk__BackingField`: float @ 0x54
+- `ComboCountk__BackingField`: int @ 0x58
 
 ### Methods (14)
 - `OnEnable()`: void @ 0x1382F70

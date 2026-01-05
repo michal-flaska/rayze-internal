@@ -97,8 +97,7 @@ namespace Game {
 
 	Unity::Camera* Player::GetCamera() {
 		if (!instance) return nullptr;
-		// <Camera>k__BackingField
-		return *reinterpret_cast<Unity::Camera**>((uintptr_t)instance + 0x100);
+		return *reinterpret_cast<Unity::Camera**>((uintptr_t)instance + Offsets::Player::Camerak__BackingField);
 	}
 
 	Unity::Transform* Player::GetCameraTransform() {
@@ -162,8 +161,7 @@ namespace Game {
 
 	bool Player::IsActive() {
 		if (!instance) return false;
-		// Use the backing field name as generated
-		return *reinterpret_cast<bool*>((uintptr_t)instance + 0x108); // <IsActive>k__BackingField
+		return *reinterpret_cast<bool*>((uintptr_t)instance + Offsets::Player::IsActivek__BackingField);
 	}
 
 	float Player::GetCurrentSpeed() {

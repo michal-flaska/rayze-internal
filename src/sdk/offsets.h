@@ -47,10 +47,10 @@ namespace Offsets {
 		constexpr uintptr_t _timeComponent = 0xE8; // PlayerTimeComponent
 		constexpr uintptr_t _statsComponent = 0xF0; // PlayerStatsComponent
 		constexpr uintptr_t _debugComponent = 0xF8; // PlayerDebugComponent
-		constexpr uintptr_t <Camera>k__BackingField = 0x100; // Camera
-		constexpr uintptr_t <IsActive>k__BackingField = 0x108; // bool
-		constexpr uintptr_t <WarpComponent>k__BackingField = 0x110; // PlayerWarpComponent
-		constexpr uintptr_t <ComboComponent>k__BackingField = 0x118; // PlayerComboComponent
+		constexpr uintptr_t Camerak__BackingField = 0x100; // Camera
+		constexpr uintptr_t IsActivek__BackingField = 0x108; // bool
+		constexpr uintptr_t WarpComponentk__BackingField = 0x110; // PlayerWarpComponent
+		constexpr uintptr_t ComboComponentk__BackingField = 0x118; // PlayerComboComponent
 
 		// Methods
 		constexpr uintptr_t Awake = 0x138C7C0; // void
@@ -79,29 +79,29 @@ namespace Offsets {
 		constexpr uintptr_t get_DebugNoClip = 0x138E140; // bool
 		constexpr uintptr_t get_DebugHiddenView = 0x138E120; // bool
 		constexpr uintptr_t get_DebugOxygenDisabled = 0x138E160; // bool
-		constexpr uintptr_t .ctor = 0x138D270; // void
-		constexpr uintptr_t .cctor = 0x138D0D0; // void
+		constexpr uintptr_t _ctor = 0x138D270; // void
+		constexpr uintptr_t _cctor = 0x138D0D0; // void
 	}
 
 	// Hyperstrange.WARPZ.TimeManager
 	namespace TimeManager {
 		// Fields
 		constexpr uintptr_t OnTimeScaleChanged = 0x0; // Action<float>
-		constexpr uintptr_t <CurrentTimeScale>k__BackingField = 0x8; // float
+		constexpr uintptr_t CurrentTimeScalek__BackingField = 0x8; // float
 
 		// Methods
 		constexpr uintptr_t SetTimeScale = 0x1345B80; // void
 		constexpr uintptr_t get_CurrentTimeScale = 0x1345DC0; // float
 		constexpr uintptr_t set_CurrentTimeScale = 0x1345E20; // void
-		constexpr uintptr_t .ctor = 0x1345D50; // void
-		constexpr uintptr_t .cctor = 0x1345C70; // void
+		constexpr uintptr_t _ctor = 0x1345D50; // void
+		constexpr uintptr_t _cctor = 0x1345C70; // void
 	}
 
 	// Hyperstrange.WARPZ.FinishPanel
 	namespace FinishPanel {
 
 		// Methods
-		constexpr uintptr_t .ctor = 0x1357010; // void
+		constexpr uintptr_t _ctor = 0x1357010; // void
 	}
 
 	// Hyperstrange.WARPZ.PlayerMovementComponent
@@ -120,10 +120,10 @@ namespace Offsets {
 		constexpr uintptr_t _idleTween = 0x70; // Tween
 		constexpr uintptr_t _direction = 0x78; // Vector3
 		constexpr uintptr_t _speedStat = 0x84; // SpeedStat
-		constexpr uintptr_t <IsMoving>k__BackingField = 0x88; // bool
-		constexpr uintptr_t <CurrentSpeed>k__BackingField = 0x8C; // ObscuredFloat
-		constexpr uintptr_t <TargetSpeed>k__BackingField = 0xA4; // ObscuredFloat
-		constexpr uintptr_t <MaxSpeed>k__BackingField = 0xBC; // ObscuredFloat
+		constexpr uintptr_t IsMovingk__BackingField = 0x88; // bool
+		constexpr uintptr_t CurrentSpeedk__BackingField = 0x8C; // ObscuredFloat
+		constexpr uintptr_t TargetSpeedk__BackingField = 0xA4; // ObscuredFloat
+		constexpr uintptr_t MaxSpeedk__BackingField = 0xBC; // ObscuredFloat
 
 		// Methods
 		constexpr uintptr_t OnEnable = 0x1388710; // void
@@ -151,7 +151,7 @@ namespace Offsets {
 		constexpr uintptr_t set_TargetSpeed = 0x1389810; // void
 		constexpr uintptr_t get_MaxSpeed = 0x13896F0; // ObscuredFloat
 		constexpr uintptr_t set_MaxSpeed = 0x13897F0; // void
-		constexpr uintptr_t .ctor = 0x1389640; // void
+		constexpr uintptr_t _ctor = 0x1389640; // void
 	}
 
 	// Hyperstrange.WARPZ.PlayerWarpComponent
@@ -159,8 +159,8 @@ namespace Offsets {
 		// Fields
 		constexpr uintptr_t _hitInfo = 0x48; // RaycastHit
 		constexpr uintptr_t _currentHittable = 0x78; // IHittable
-		constexpr uintptr_t <CurrentWarpableDuration>k__BackingField = 0x80; // float
-		constexpr uintptr_t <CurrentPanel>k__BackingField = 0x88; // Panel
+		constexpr uintptr_t CurrentWarpableDurationk__BackingField = 0x80; // float
+		constexpr uintptr_t CurrentPanelk__BackingField = 0x88; // Panel
 
 		// Methods
 		constexpr uintptr_t OnEnable = 0x132E7C0; // void
@@ -173,7 +173,7 @@ namespace Offsets {
 		constexpr uintptr_t set_CurrentWarpableDuration = 0x132EC60; // void
 		constexpr uintptr_t get_CurrentPanel = 0x3FA760; // Panel
 		constexpr uintptr_t set_CurrentPanel = 0x6583E0; // void
-		constexpr uintptr_t .ctor = 0x132EB90; // void
+		constexpr uintptr_t _ctor = 0x132EB90; // void
 	}
 
 	// Hyperstrange.WARPZ.PlayerComboComponent
@@ -182,8 +182,8 @@ namespace Offsets {
 		constexpr uintptr_t _comboTimeout = 0x48; // float
 		constexpr uintptr_t _activeCombo = 0x4C; // bool
 		constexpr uintptr_t _lastComboIncrementTimeStamp = 0x50; // float
-		constexpr uintptr_t <ComboTimeoutProgress>k__BackingField = 0x54; // float
-		constexpr uintptr_t <ComboCount>k__BackingField = 0x58; // int
+		constexpr uintptr_t ComboTimeoutProgressk__BackingField = 0x54; // float
+		constexpr uintptr_t ComboCountk__BackingField = 0x58; // int
 
 		// Methods
 		constexpr uintptr_t OnEnable = 0x1382F70; // void
@@ -199,6 +199,6 @@ namespace Offsets {
 		constexpr uintptr_t set_ComboTimeoutProgress = 0x71D8D0; // void
 		constexpr uintptr_t get_ComboCount = 0x5B7B80; // int
 		constexpr uintptr_t set_ComboCount = 0x5B8010; // void
-		constexpr uintptr_t .ctor = 0x1383370; // void
+		constexpr uintptr_t _ctor = 0x1383370; // void
 	}
 }

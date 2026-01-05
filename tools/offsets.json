@@ -164,25 +164,25 @@
         "rva": "0x0",
         "va": "0x0"
       },
-      "<Camera>k__BackingField": {
+      "Camerak__BackingField": {
         "type": "Camera",
         "offset": "0x100",
         "rva": "0x0",
         "va": "0x0"
       },
-      "<IsActive>k__BackingField": {
+      "IsActivek__BackingField": {
         "type": "bool",
         "offset": "0x108",
         "rva": "0x0",
         "va": "0x0"
       },
-      "<WarpComponent>k__BackingField": {
+      "WarpComponentk__BackingField": {
         "type": "PlayerWarpComponent",
         "offset": "0x110",
         "rva": "0x0",
         "va": "0x0"
       },
-      "<ComboComponent>k__BackingField": {
+      "ComboComponentk__BackingField": {
         "type": "PlayerComboComponent",
         "offset": "0x118",
         "rva": "0x0",
@@ -346,13 +346,13 @@
         "rva": "0x138F960",
         "va": "0x18138F960"
       },
-      ".ctor": {
+      "_ctor": {
         "return_type": "void",
         "offset": "0x138D270",
         "rva": "0x138EA70",
         "va": "0x18138EA70"
       },
-      ".cctor": {
+      "_cctor": {
         "return_type": "void",
         "offset": "0x138D0D0",
         "rva": "0x138E8D0",
@@ -370,7 +370,7 @@
         "rva": "0x0",
         "va": "0x0"
       },
-      "<CurrentTimeScale>k__BackingField": {
+      "CurrentTimeScalek__BackingField": {
         "type": "float",
         "offset": "0x8",
         "rva": "0x0",
@@ -396,13 +396,13 @@
         "rva": "0x1347620",
         "va": "0x181347620"
       },
-      ".ctor": {
+      "_ctor": {
         "return_type": "void",
         "offset": "0x1345D50",
         "rva": "0x1347550",
         "va": "0x181347550"
       },
-      ".cctor": {
+      "_cctor": {
         "return_type": "void",
         "offset": "0x1345C70",
         "rva": "0x1347470",
@@ -415,7 +415,7 @@
     "namespace": "Hyperstrange.WARPZ",
     "fields": {},
     "methods": {
-      ".ctor": {
+      "_ctor": {
         "return_type": "void",
         "offset": "0x1357010",
         "rva": "0x1358810",
@@ -505,25 +505,25 @@
         "rva": "0x0",
         "va": "0x0"
       },
-      "<IsMoving>k__BackingField": {
+      "IsMovingk__BackingField": {
         "type": "bool",
         "offset": "0x88",
         "rva": "0x0",
         "va": "0x0"
       },
-      "<CurrentSpeed>k__BackingField": {
+      "CurrentSpeedk__BackingField": {
         "type": "ObscuredFloat",
         "offset": "0x8C",
         "rva": "0x0",
         "va": "0x0"
       },
-      "<TargetSpeed>k__BackingField": {
+      "TargetSpeedk__BackingField": {
         "type": "ObscuredFloat",
         "offset": "0xA4",
         "rva": "0x0",
         "va": "0x0"
       },
-      "<MaxSpeed>k__BackingField": {
+      "MaxSpeedk__BackingField": {
         "type": "ObscuredFloat",
         "offset": "0xBC",
         "rva": "0x0",
@@ -681,7 +681,7 @@
         "rva": "0x138AFF0",
         "va": "0x18138AFF0"
       },
-      ".ctor": {
+      "_ctor": {
         "return_type": "void",
         "offset": "0x1389640",
         "rva": "0x138AE40",
@@ -705,13 +705,13 @@
         "rva": "0x0",
         "va": "0x0"
       },
-      "<CurrentWarpableDuration>k__BackingField": {
+      "CurrentWarpableDurationk__BackingField": {
         "type": "float",
         "offset": "0x80",
         "rva": "0x0",
         "va": "0x0"
       },
-      "<CurrentPanel>k__BackingField": {
+      "CurrentPanelk__BackingField": {
         "type": "Panel",
         "offset": "0x88",
         "rva": "0x0",
@@ -779,7 +779,7 @@
         "rva": "0x659BE0",
         "va": "0x180659BE0"
       },
-      ".ctor": {
+      "_ctor": {
         "return_type": "void",
         "offset": "0x132EB90",
         "rva": "0x1330390",
@@ -809,13 +809,13 @@
         "rva": "0x0",
         "va": "0x0"
       },
-      "<ComboTimeoutProgress>k__BackingField": {
+      "ComboTimeoutProgressk__BackingField": {
         "type": "float",
         "offset": "0x54",
         "rva": "0x0",
         "va": "0x0"
       },
-      "<ComboCount>k__BackingField": {
+      "ComboCountk__BackingField": {
         "type": "int",
         "offset": "0x58",
         "rva": "0x0",
@@ -901,7 +901,7 @@
         "rva": "0x5B9810",
         "va": "0x1805B9810"
       },
-      ".ctor": {
+      "_ctor": {
         "return_type": "void",
         "offset": "0x1383370",
         "rva": "0x1384B70",
