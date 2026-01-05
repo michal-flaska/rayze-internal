@@ -63,18 +63,9 @@ DWORD WINAPI MainThread(LPVOID param) {
 
 	// Main loop
 	while (!(GetAsyncKeyState(VK_END) & 1)) {
-		// Temporarily disabled features to prevent crashes
-		// TODO: Fix memory access in features
-		/*
-		__try {
-			Features::Speedhack::Update();
-			Features::Noclip::Update();
-			Features::Aimbot::Update();
-		}
-		__except (EXCEPTION_EXECUTE_HANDLER) {
-			printf("[!] Exception in main loop: 0x%X\n", GetExceptionCode());
-		}
-		*/
+		Features::Speedhack::Update();
+		Features::Noclip::Update();
+		Features::Aimbot::Update();
 
 		Sleep(100);
 	}

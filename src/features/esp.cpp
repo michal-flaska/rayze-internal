@@ -80,11 +80,26 @@ namespace Features {
 		void Render() {
 			if (!Menu::Features::g_ESP) return;
 
+			static bool firstRun = true;
+			if (firstRun) {
+				printf("[ESP] Render called for first time\n");
+				firstRun = false;
+			}
+
 			auto player = Game::Player::GetLocalPlayer();
-			if (!player || !player->IsValid()) return;
+			if (!player || !player->IsValid()) {
+				static bool warnedOnce = false;
+				if (!warnedOnce) {
+					printf("[ESP] Player not found or invalid\n");
+					warnedOnce = true;
+				}
+				return;
+			}
 
 			// Update panel cache
 			UpdatePanelCache();
+
+			if (cachedPanels.empty()) return;
 
 			ImGuiIO& io = ImGui::GetIO();
 			Unity::Vector2 screenCenter(io.DisplaySize.x / 2.0f, io.DisplaySize.y);

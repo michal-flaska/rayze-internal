@@ -14,10 +14,15 @@ namespace Features {
 		void Update() {
 			if (!Menu::Features::g_Speedhack) {
 				if (wasEnabled) {
+					printf("[Speedhack] Disabling (reset to 1.0x)\n");
 					SetSpeed(1.0f);
 					wasEnabled = false;
 				}
 				return;
+			}
+
+			if (!wasEnabled) {
+				printf("[Speedhack] Enabling (%.1fx)\n", Menu::Features::g_SpeedhackMultiplier);
 			}
 
 			SetSpeed(Menu::Features::g_SpeedhackMultiplier);

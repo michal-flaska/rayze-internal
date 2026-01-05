@@ -9,16 +9,32 @@ namespace Features {
 			printf("[Noclip] Initialized (debug mode - uses Player.DebugNoClip)\n");
 		}
 
+		static bool wasEnabled = false;
+
 		void Update() {
-			// RAYZE has built-in debug noclip we can enable
-			// Check Player class - it has OnDebugNoClipChanged event and DebugNoClip property
+			if (!Menu::Features::g_Noclip) {
+				if (wasEnabled) {
+					printf("[Noclip] Disabled\n");
+					wasEnabled = false;
+				}
+				return;
+			}
 
 			auto player = Game::Player::GetLocalPlayer();
-			if (!player || !player->IsValid()) return;
+			if (!player || !player->IsValid()) {
+				if (wasEnabled) {
+					printf("[Noclip] Player not found\n");
+					wasEnabled = false;
+				}
+				return;
+			}
 
-			// For now, this is a placeholder
-			// You'd need to find the debug component and set the noclip flag
-			// Or hook movement/collision methods
+			if (!wasEnabled) {
+				printf("[Noclip] Enabled (debug mode)\n");
+				wasEnabled = true;
+			}
+
+			// TODO: Actually implement noclip - need to find debug component or hook collision
 		}
 
 		void Shutdown() {
