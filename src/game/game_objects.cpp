@@ -48,19 +48,31 @@ namespace Game {
 	std::vector<T*> Objects::FindObjectsOfType(const char* namespaze, const char* className) {
 		std::vector<T*> result;
 
-		void* klass = IL2CPP::GetClassFromName(namespaze, className);
-		if (!klass) return result;
+		__try {
+			void* klass = IL2CPP::GetClassFromName(namespaze, className);
+			if (!klass) return result;
 
-		void* objArray = GetObjectsOfType(klass);
-		if (!objArray) return result;
+			void* objArray = GetObjectsOfType(klass);
+			if (!objArray) return result;
 
-		// Cast to Il2CppArray
-		auto* arr = reinterpret_cast<Unity::Il2CppArray<void*>*>(objArray);
+			// Cast to Il2CppArray
+			auto* arr = reinterpret_cast<Unity::Il2CppArray<void*>*>(objArray);
+			if (!arr) return result;
 
-		for (size_t i = 0; i < arr->max_length; i++) {
-			if (arr->items[i]) {
-				result.push_back(reinterpret_cast<T*>(arr->items[i]));
+			// Validate array before accessing
+			if (arr->max_length > 10000) {
+				printf("[!] Suspicious array length: %zu\n", arr->max_length);
+				return result;
 			}
+
+			for (size_t i = 0; i < arr->max_length; i++) {
+				if (arr->items[i]) {
+					result.push_back(reinterpret_cast<T*>(arr->items[i]));
+				}
+			}
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER) {
+			printf("[!] Exception in FindObjectsOfType(%s.%s): 0x%X\n", namespaze, className, GetExceptionCode());
 		}
 
 		return result;
@@ -97,7 +109,18 @@ namespace Game {
 
 	Unity::Camera* Player::GetCamera() {
 		if (!instance) return nullptr;
-		return *reinterpret_cast<Unity::Camera**>((uintptr_t)instance + Offsets::Player::Camerak__BackingField);
+
+		__try {
+			Unity::Camera* cam = *reinterpret_cast<Unity::Camera**>((uintptr_t)instance + Offsets::Player::Camerak__BackingField);
+			// Basic validation - check if pointer seems reasonable
+			if ((uintptr_t)cam < 0x10000 || (uintptr_t)cam > 0x7FFFFFFFFFFF) {
+				return nullptr;
+			}
+			return cam;
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER) {
+			return nullptr;
+		}
 	}
 
 	Unity::Transform* Player::GetCameraTransform() {
@@ -186,24 +209,38 @@ namespace Game {
 		auto transform = GetTransform();
 		if (!transform) return Unity::Vector3();
 
-		using GetPosition_t = Unity::Vector3(__fastcall*)(Unity::Transform*);
-		static auto fn = reinterpret_cast<GetPosition_t>(
-			(uintptr_t)GetModuleHandleA("GameAssembly.dll") + Offsets::Unity::Transform_get_position
-			);
+		__try {
+			using GetPosition_t = Unity::Vector3(__fastcall*)(Unity::Transform*);
+			static auto fn = reinterpret_cast<GetPosition_t>(
+				(uintptr_t)GetModuleHandleA("GameAssembly.dll") + Offsets::Unity::Transform_get_position
+				);
 
-		return fn(transform);
+			if (!fn) return Unity::Vector3();
+
+			return fn(transform);
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER) {
+			return Unity::Vector3();
+		}
 	}
 
 	// Helper functions
 	Unity::Vector3 WorldToScreen(Unity::Camera* camera, const Unity::Vector3& worldPos) {
 		if (!camera) return Unity::Vector3();
 
-		using WorldToScreenPoint_t = Unity::Vector3(__fastcall*)(Unity::Camera*, Unity::Vector3, int);
-		static auto fn = reinterpret_cast<WorldToScreenPoint_t>(
-			(uintptr_t)GetModuleHandleA("GameAssembly.dll") + Offsets::Unity::Camera_WorldToScreenPoint
-			);
+		__try {
+			using WorldToScreenPoint_t = Unity::Vector3(__fastcall*)(Unity::Camera*, Unity::Vector3, int);
+			static auto fn = reinterpret_cast<WorldToScreenPoint_t>(
+				(uintptr_t)GetModuleHandleA("GameAssembly.dll") + Offsets::Unity::Camera_WorldToScreenPoint
+				);
 
-		return fn(camera, worldPos, 0); // MonoOrStereoscopicEye = 0
+			if (!fn) return Unity::Vector3();
+
+			return fn(camera, worldPos, 0); // MonoOrStereoscopicEye = 0
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER) {
+			return Unity::Vector3();
+		}
 	}
 
 	bool IsOnScreen(const Unity::Vector3& screenPos) {

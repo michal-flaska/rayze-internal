@@ -19,30 +19,43 @@ namespace Features {
 
 			cachedPanels.clear();
 
-			// Find all panels
-			auto panelObjects = Game::Objects::FindObjectsOfType<void>("Hyperstrange.WARPZ", "Panel");
-			for (auto obj : panelObjects) {
-				cachedPanels.push_back(new Game::Panel(obj));
-			}
+			__try {
+				// Find all panels
+				auto panelObjects = Game::Objects::FindObjectsOfType<void>("Hyperstrange.WARPZ", "Panel");
+				for (auto obj : panelObjects) {
+					if (obj) {
+						cachedPanels.push_back(new Game::Panel(obj));
+					}
+				}
 
-			lastPanelUpdate = now;
-			printf("[ESP] Found %zu panels\n", cachedPanels.size());
+				lastPanelUpdate = now;
+				printf("[ESP] Found %zu panels\n", cachedPanels.size());
+			}
+			__except (EXCEPTION_EXECUTE_HANDLER) {
+				printf("[ESP] Exception in UpdatePanelCache: 0x%X\n", GetExceptionCode());
+				cachedPanels.clear();
+			}
 		}
 
 		bool WorldToScreen(const Unity::Vector3& world, Unity::Vector2& screen) {
-			auto player = Game::Player::GetLocalPlayer();
-			if (!player || !player->IsValid()) return false;
+			__try {
+				auto player = Game::Player::GetLocalPlayer();
+				if (!player || !player->IsValid()) return false;
 
-			auto camera = player->GetCamera();
-			if (!camera) return false;
+				auto camera = player->GetCamera();
+				if (!camera) return false;
 
-			Unity::Vector3 screenPos = Game::WorldToScreen(camera, world);
+				Unity::Vector3 screenPos = Game::WorldToScreen(camera, world);
 
-			if (!Game::IsOnScreen(screenPos)) return false;
+				if (!Game::IsOnScreen(screenPos)) return false;
 
-			screen.x = screenPos.x;
-			screen.y = screenPos.y;
-			return true;
+				screen.x = screenPos.x;
+				screen.y = screenPos.y;
+				return true;
+			}
+			__except (EXCEPTION_EXECUTE_HANDLER) {
+				return false;
+			}
 		}
 
 		void DrawBox(const Unity::Vector2& screenPos, float size, const Unity::Color& color) {
@@ -76,40 +89,56 @@ namespace Features {
 		void Render() {
 			if (!Menu::Features::g_ESP) return;
 
-			auto player = Game::Player::GetLocalPlayer();
-			if (!player || !player->IsValid()) return;
+			__try {
+				auto player = Game::Player::GetLocalPlayer();
+				if (!player || !player->IsValid()) return;
 
-			// Update panel cache
-			UpdatePanelCache();
+				// Update panel cache
+				UpdatePanelCache();
 
-			ImGuiIO& io = ImGui::GetIO();
-			Unity::Vector2 screenCenter(io.DisplaySize.x / 2.0f, io.DisplaySize.y);
+				ImGuiIO& io = ImGui::GetIO();
+				Unity::Vector2 screenCenter(io.DisplaySize.x / 2.0f, io.DisplaySize.y);
 
-			// Draw panels
-			for (auto panel : cachedPanels) {
-				if (!panel || !panel->IsValid()) continue;
+				// Draw panels
+				for (auto panel : cachedPanels) {
+					if (!panel || !panel->IsValid()) continue;
 
-				Unity::Vector3 worldPos = panel->GetPosition();
-				Unity::Vector2 screenPos;
+					Unity::Vector3 worldPos;
+					__try {
+						worldPos = panel->GetPosition();
+					}
+					__except (EXCEPTION_EXECUTE_HANDLER) {
+						continue;
+					}
 
-				if (!WorldToScreen(worldPos, screenPos)) continue;
+					Unity::Vector2 screenPos;
+					if (!WorldToScreen(worldPos, screenPos)) continue;
 
-				// Determine panel type by checking class name or other properties
-				// For now, draw all panels as potential targets
-				Unity::Color color(1.0f, 0.0f, 0.0f, 1.0f); // Red
+					// Determine panel type by checking class name or other properties
+					// For now, draw all panels as potential targets
+					Unity::Color color(1.0f, 0.0f, 0.0f, 1.0f); // Red
 
-				if (Menu::Features::g_ESPBoxes) {
-					DrawBox(screenPos, 20.0f, color);
+					if (Menu::Features::g_ESPBoxes) {
+						DrawBox(screenPos, 20.0f, color);
+					}
+
+					if (Menu::Features::g_ESPSnaplines) {
+						DrawLine(screenCenter, screenPos, color);
+					}
+
+					// Draw distance
+					__try {
+						float dist = worldPos.Distance(player->GetPosition());
+						std::string distText = std::to_string((int)dist) + "m";
+						DrawText(Unity::Vector2(screenPos.x, screenPos.y - 25), distText, color);
+					}
+					__except (EXCEPTION_EXECUTE_HANDLER) {
+						// Skip distance calculation if it fails
+					}
 				}
-
-				if (Menu::Features::g_ESPSnaplines) {
-					DrawLine(screenCenter, screenPos, color);
-				}
-
-				// Draw distance
-				float dist = worldPos.Distance(player->GetPosition());
-				std::string distText = std::to_string((int)dist) + "m";
-				DrawText(Unity::Vector2(screenPos.x, screenPos.y - 25), distText, color);
+			}
+			__except (EXCEPTION_EXECUTE_HANDLER) {
+				printf("[ESP] Exception in Render: 0x%X\n", GetExceptionCode());
 			}
 		}
 

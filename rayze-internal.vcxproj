@@ -168,6 +168,7 @@
     <ClInclude Include="src\game\game_objects.h" />
     <ClInclude Include="src\gui\menu.h" />
     <ClInclude Include="src\hooks.h" />
+    <ClInclude Include="src\sdk\offsets.h" />
     <ClInclude Include="src\utils\memory.h" />
     <ClInclude Include="src\sdk\il2cpp.h" />
     <ClInclude Include="src\sdk\unity.h" />
