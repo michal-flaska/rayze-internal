@@ -271,8 +271,14 @@ namespace Game {
 		if (!instance) return false;
 
 		__try {
-			// _isActive is at offset 0x50 according to dump.cs
-			return *reinterpret_cast<bool*>((uintptr_t)instance + 0x50);
+			// Call the virtual get_IsActive() function at RVA 0x3FBFA0
+			using GetIsActive_t = bool(__fastcall*)(void*);
+			static auto fn = reinterpret_cast<GetIsActive_t>(
+				(uintptr_t)GetModuleHandleA("GameAssembly.dll") + 0x3FBFA0
+			);
+
+			if (!fn) return false;
+			return fn(instance);
 		}
 		__except (EXCEPTION_EXECUTE_HANDLER) {
 			return false;
